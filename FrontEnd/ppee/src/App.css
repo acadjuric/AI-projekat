@@ -40,3 +40,18 @@
 .file-container input{
   margin: 20px;
 }
+
+
+/* page training */
+.training-container{
+  width: 100%;
+  text-align: center;
+  padding-top: 100px;
+}
+
+/* page reports */
+.report-container{
+  width: 100%;
+  text-align: center;
+  padding-top: 100px;
+}

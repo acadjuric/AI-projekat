@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 
 class Navigation extends Component {
 
@@ -6,9 +7,9 @@ class Navigation extends Component {
 
         return (
             <div className="navigation">
-                <a href="#">File upload</a>
-                <a href="#">Training</a>
-                <a href="#">Report</a>
+                <Link to="/file-upload">File upload</Link>
+                <Link to="/training">Training</Link>
+                <Link to="/report">Report</Link>
             </div>
         );
     }
