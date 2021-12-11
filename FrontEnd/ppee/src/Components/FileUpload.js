@@ -3,6 +3,8 @@ import imgUpload from '../assets/fileUpload.png'
 import imgCancel from '../assets/cancel.png'
 import iconExcel from '../assets/excel.png'
 import iconDocument from '../assets/anyDocument.png'
+import { baseUrl } from '../constants';
+import axios from 'axios';
 
 class FileUpload extends Component {
     constructor() {
@@ -20,6 +22,21 @@ class FileUpload extends Component {
     handleCustomBtnClick = () => {
 
         this.inputFileRef.current.click();
+        
+    }
+
+    handleUploadBtnClick =()=>{
+        if(this.state.file === null || this.state.fileName === "") return;
+
+        var form = new FormData();
+        form.append("file", this.state.file, this.state.fileName);
+        axios.post(baseUrl+"Home/FileUpload", form).then(response=>{
+
+            console.log("Stiglo je od servera-> ", response.data);
+
+        }).catch(error=>{
+            console.log(error);
+        })
     }
 
     handleFileChange = event => {
@@ -68,7 +85,7 @@ class FileUpload extends Component {
         return (
             <div className="file-upload-body">
                 <div className="container">
-                    <div className={this.state.fileUrl === null ? "warpper" : "warpper active"}>
+                    <div className={this.state.fileUrl === null ? "warpper" : "warpper active"} >
                         <div className="image">
                             <img src={this.state.fileUrl} alt="" />
                         </div>
@@ -88,7 +105,8 @@ class FileUpload extends Component {
                     </div>
 
                     <input id="default-btn" type="file" hidden={true} ref={this.inputFileRef} onChange={this.handleFileChange} />
-                    <button id="custom-btn" onClick={this.handleCustomBtnClick}>Choose a file</button>
+                    <button id="custom-btn" onClick={this.handleCustomBtnClick}>Choose a file</button><br/>
+                    <button id="custom-btn" className="upload-btn" onClick={this.handleUploadBtnClick}>Send file</button>
                 </div>
             </div>
         );
