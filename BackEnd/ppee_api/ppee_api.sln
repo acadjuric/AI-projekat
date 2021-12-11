@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.1525
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ppee_api", "ppee_api\ppee_api.csproj", "{0D9E9A75-1C49-4A88-8B73-DA51B3F101C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ppee_servis", "ppee_servis\ppee_servis.csproj", "{172C8022-C7B0-44E5-B491-BBF660F427E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ppee_dataLayer", "ppee_dataLayer\ppee_dataLayer.csproj", "{A2095704-ACE2-4AC5-B5F8-D920193063AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{0D9E9A75-1C49-4A88-8B73-DA51B3F101C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D9E9A75-1C49-4A88-8B73-DA51B3F101C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D9E9A75-1C49-4A88-8B73-DA51B3F101C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{172C8022-C7B0-44E5-B491-BBF660F427E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{172C8022-C7B0-44E5-B491-BBF660F427E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{172C8022-C7B0-44E5-B491-BBF660F427E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{172C8022-C7B0-44E5-B491-BBF660F427E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2095704-ACE2-4AC5-B5F8-D920193063AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2095704-ACE2-4AC5-B5F8-D920193063AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2095704-ACE2-4AC5-B5F8-D920193063AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2095704-ACE2-4AC5-B5F8-D920193063AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ppee_servis.Interfaces;
 
 namespace ppee_api.Controllers
 {
@@ -14,9 +15,11 @@ namespace ppee_api.Controllers
     [EnableCors("CorsPolicy")]
     public class HomeController : ControllerBase
     {
-        public HomeController()
-        {
+        IServisPPEE servis;
 
+        public HomeController(IServisPPEE servis)
+        {
+            this.servis = servis;
         }
 
         [HttpPost, DisableRequestSizeLimit]
@@ -25,12 +28,26 @@ namespace ppee_api.Controllers
         {
             try
             {
-                var file = Request.Form.Files[0];
-                string a = file.Name;
+                if (Request.Form.Files.Count != 0) {
+                    var file = Request.Form.Files[0];
+                    string a = file.Name;
 
-                if(file.Length > 0)
-                {
-                    return Ok();
+                    if (file.Length > 0)
+                    {
+                        var stream = file.OpenReadStream();
+
+                        if (await servis.ReadFile(stream))
+                        {
+                            return Ok();
+                        }
+                        else
+                            return BadRequest();
+
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
                 }
                 else
                 {

@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ppee_servis.Interfaces;
+using ppee_servis.Services;
 
 namespace ppee_api
 {
@@ -27,6 +29,9 @@ namespace ppee_api
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.Add(new ServiceDescriptor(typeof(IServisPPEE), typeof(ServisPPEE), ServiceLifetime.Scoped));
+
             services.Configure<FormOptions>(options =>
             {
                 options.ValueCountLimit = int.MaxValue; //default 1024
