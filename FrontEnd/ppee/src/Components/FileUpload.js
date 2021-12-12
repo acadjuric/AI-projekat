@@ -30,7 +30,7 @@ class FileUpload extends Component {
 
         var form = new FormData();
         form.append("file", this.state.file, this.state.fileName);
-        axios.post(baseUrl+"Home/FileUpload", form).then(response=>{
+        axios.post(baseUrl+"home/fileupload", form).then(response=>{
 
             console.log("Stiglo je od servera-> ", response.data);
 
