@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ppee_service.Interfaces
+{
+    public interface IServicePPEE
+    {
+        Task<bool> ReadFile(Stream stream);
+    }
+}
