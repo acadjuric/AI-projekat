@@ -10,18 +10,14 @@ namespace ppee_dataLayer.Services
 {
     public class DatabaseService : IDatabase
     {
-        public async Task<bool> WriteToDataBase(List<Load> potorsnja)
+        public async Task<bool> WriteToDataBase(List<WeatherAndLoad> finalData)
         {
             try
             {
                 using (var db = new PPEE_DataContext())
                 {
-                    //potorsnja.ForEach(item => db.Loads.Add(item));
-
-                    foreach (var item in potorsnja)
-                    {
-                        db.Loads.Add(item);
-                    }
+                   
+                    db.WeatherAndLoads.AddRange(finalData);
 
                     await db.SaveChangesAsync();
                     return true;

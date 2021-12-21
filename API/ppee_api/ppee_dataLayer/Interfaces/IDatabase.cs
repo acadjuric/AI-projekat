@@ -9,6 +9,6 @@ namespace ppee_dataLayer.Interfaces
 {
     public interface IDatabase
     {
-        Task<bool> WriteToDataBase(List<Load> potorsnja);
+        Task<bool> WriteToDataBase(List<WeatherAndLoad> finalData);
     }
 }

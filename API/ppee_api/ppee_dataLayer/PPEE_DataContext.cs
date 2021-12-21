@@ -18,7 +18,6 @@ namespace ppee_dataLayer
         {
 
         }
-
-        public DbSet<Load> Loads { get; set; }
+        public DbSet<WeatherAndLoad> WeatherAndLoads { get; set; }
     }
 }
