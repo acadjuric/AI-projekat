@@ -10,5 +10,7 @@ namespace ppee_dataLayer.Interfaces
     public interface IDatabase
     {
         Task<bool> WriteToDataBase(List<WeatherAndLoad> finalData);
+
+        Task<List<WeatherAndLoad>> LoadFromDataBase();
     }
 }

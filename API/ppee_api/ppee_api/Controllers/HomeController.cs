@@ -37,6 +37,8 @@ namespace ppee_api.Controllers
                     {
                         if (await service.ReadFile(filestream))
                         {
+                            await service.Training();
+
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
                         else

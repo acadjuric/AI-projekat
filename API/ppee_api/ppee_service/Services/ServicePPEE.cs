@@ -33,6 +33,7 @@ namespace ppee_service.Services
         string prethondaDewPointTemperature = string.Empty;
         #endregion
 
+
         public async Task<bool> ReadFile(Stream stream)
         {
 
@@ -264,11 +265,6 @@ namespace ppee_service.Services
 
                     //item.MWh = potorsnja.First(x => x.Date.Equals(validDateFormat) && x.FromTime.Equals(time)).MWh;
 
-                    if (finalData.Count == 7659)
-                    {
-                        string a = "ACA";
-                    }
-
                     WeatherAndLoad wl = new WeatherAndLoad()
                     {
                         Date = item.Date,
@@ -419,5 +415,46 @@ namespace ppee_service.Services
 
             return result;
         }
+
+        public async Task<bool> Training()
+        {
+
+            IDatabase dataSloj = new DatabaseService();
+            List<WeatherAndLoad> data = await dataSloj.LoadFromDataBase();
+
+            var minAirTemperature = data.Min(x => x.AirTemperature);
+            var maxAirTemperature = data.Max(x => x.AirTemperature);
+
+            var minHumidity = data.Min(x => x.RelativeHumidity);
+            var maxHumidity = data.Max(x => x.RelativeHumidity);
+
+            var minAtmosphericPressure = data.Min(x => x.AtmosphericPressure);
+            var maxAtmosphericPressure = data.Max(x => x.AtmosphericPressure);
+
+            var minPressureTendency = data.Min(x => x.PressureTendency);
+            var maxPressureTendency = data.Max(x => x.PressureTendency);
+
+            var minMeanWindSpeed = data.Min(x => x.MeanWindSpeed);
+            var maxMeanWindSpeed = data.Max(x => x.MeanWindSpeed);
+
+            var minMaxGustValue = data.Min(x => x.MaxGustValue);
+            var maxMaxGustValue = data.Max(x => x.MaxGustValue);
+
+            var minTotalCloudCover = data.Min(x => x.TotalCloudCover);
+            var maxTotalCloudCover = data.Max(x => x.TotalCloudCover);
+
+            var minVisibility = data.Min(x => x.Visibility);
+            var maxVisibility = data.Max(x => x.Visibility);
+
+            var minDewPointTemperature = data.Min(x => x.DewPointTemperature);
+            var maxDewPointTemperature = data.Max(x => x.DewPointTemperature);
+
+            var minMWh = data.Min(x => x.MWh);
+            var maxMWh = data.Max(x => x.MWh);
+
+            return true;
+
+        }
+
     }
 }

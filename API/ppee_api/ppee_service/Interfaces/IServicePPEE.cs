@@ -10,5 +10,7 @@ namespace ppee_service.Interfaces
     public interface IServicePPEE
     {
         Task<bool> ReadFile(Stream stream);
+
+        Task<bool> Training();
     }
 }
