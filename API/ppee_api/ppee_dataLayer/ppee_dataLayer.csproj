@@ -55,9 +55,9 @@
     <Compile Include="Entities\Weather.cs" />
     <Compile Include="Entities\WeatherAndLoad.cs" />
     <Compile Include="Interfaces\IDatabase.cs" />
-    <Compile Include="Migrations\202112211425597_initial.cs" />
-    <Compile Include="Migrations\202112211425597_initial.designer.cs">
-      <DependentUpon>202112211425597_initial.cs</DependentUpon>
+    <Compile Include="Migrations\202112232247189_initial.cs" />
+    <Compile Include="Migrations\202112232247189_initial.designer.cs">
+      <DependentUpon>202112232247189_initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PPEE_DataContext.cs" />
@@ -69,8 +69,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202112211425597_initial.resx">
-      <DependentUpon>202112211425597_initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202112232247189_initial.resx">
+      <DependentUpon>202112232247189_initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

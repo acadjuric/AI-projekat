@@ -268,15 +268,18 @@ namespace ppee_service.Services
                     WeatherAndLoad wl = new WeatherAndLoad()
                     {
                         Date = item.Date,
-                        AirTemperature = double.Parse(item.AirTemperature),
-                        AtmosphericPressure = double.Parse(item.AtmosphericPressure),
-                        PressureTendency = double.Parse(item.PressureTendency),
-                        RelativeHumidity = double.Parse(item.RelativeHumidity),
-                        MeanWindSpeed = double.Parse(item.MeanWindSpeed),
-                        MaxGustValue = double.Parse(item.MaxGustValue),
-                        TotalCloudCover = double.Parse(item.TotalCloudCover),
-                        Visibility = double.Parse(item.Visibility),
-                        DewPointTemperature = double.Parse(item.DewPointTemperature),
+                        DayOfWeek = (float)(DateTime.Parse(validDateFormat).DayOfWeek),
+                        Hour = float.Parse(parts[1].Split(':')[0]),
+                        Month = DateTime.Parse(validDateFormat).Month,
+                        AirTemperature = float.Parse(item.AirTemperature),
+                        AtmosphericPressure = float.Parse(item.AtmosphericPressure),
+                        PressureTendency = float.Parse(item.PressureTendency),
+                        RelativeHumidity = float.Parse(item.RelativeHumidity),
+                        MeanWindSpeed = float.Parse(item.MeanWindSpeed),
+                        MaxGustValue = float.Parse(item.MaxGustValue),
+                        TotalCloudCover = float.Parse(item.TotalCloudCover),
+                        Visibility = float.Parse(item.Visibility),
+                        DewPointTemperature = float.Parse(item.DewPointTemperature),
                         MWh = potorsnja.First(x => x.Date.Equals(validDateFormat) && x.FromTime.Equals(time)).MWh,
 
                     };
@@ -452,9 +455,54 @@ namespace ppee_service.Services
             var minMWh = data.Min(x => x.MWh);
             var maxMWh = data.Max(x => x.MWh);
 
+
+            //za ovo ne treba traziti min i max
+            // dayOfWeek -> min:0 ; max:6 ; 0-nedelja ... 6-subota
+            // month -> min:1 ; max:12 ; 1-januar ... 12-decembar
+            // hour -> min:0 ; max:23
+            var minDayOfWeek = data.Min(x => x.DayOfWeek);
+            var maxDayOfWeek = data.Max(x => x.DayOfWeek);
+
+            var minMonth = data.Min(x => x.Month);
+            var maxMonth = data.Max(x => x.Month);
+
+            var minHour = data.Min(x => x.Hour);
+            var maxHour = data.Max(x => x.Hour);
+
+            
+
+            foreach (var item in data)
+            {
+                item.AirTemperature = NormalizeData(item.AirTemperature, minAirTemperature, maxAirTemperature);
+                item.AtmosphericPressure = NormalizeData(item.AtmosphericPressure, minAtmosphericPressure, maxAtmosphericPressure);
+                item.PressureTendency = NormalizeData(item.PressureTendency, minPressureTendency, maxPressureTendency);
+                item.MeanWindSpeed = NormalizeData(item.MeanWindSpeed, minMeanWindSpeed, maxMeanWindSpeed);
+                item.MaxGustValue = NormalizeData(item.MaxGustValue, minMaxGustValue, maxMaxGustValue);
+                item.RelativeHumidity = NormalizeData(item.RelativeHumidity, minHumidity, maxHumidity);
+                item.TotalCloudCover = NormalizeData(item.TotalCloudCover, minTotalCloudCover, maxTotalCloudCover);
+                item.Visibility = NormalizeData(item.Visibility, minVisibility, maxVisibility);
+                item.DewPointTemperature = NormalizeData(item.DewPointTemperature, minDewPointTemperature, maxDewPointTemperature);
+                item.MWh = NormalizeData(item.MWh, minMWh, maxMWh);
+                item.Hour = NormalizeData(item.Hour, minHour, maxHour);
+                item.Month = NormalizeData(item.Month, minMonth, maxMonth);
+                item.DayOfWeek = NormalizeData(item.DayOfWeek, minDayOfWeek, maxDayOfWeek);
+            }
+
+           
+
+            var a = "ACA";
             return true;
 
         }
 
+        private float NormalizeData(float value, float min, float max)
+        {
+            return (value - min) / (max - min);
+        }
+
+        private float DeNormalizeData(float normalized, float min, float max)
+        {
+            return (normalized * (max - min) + min);
+        }
     }
 }

@@ -17,6 +17,7 @@ namespace ppee_dataLayer.Services
             {
                 using(var db = new PPEE_DataContext())
                 {
+                    
                     return await db.WeatherAndLoads.ToListAsync();
                 }
             }
@@ -33,7 +34,8 @@ namespace ppee_dataLayer.Services
             {
                 using (var db = new PPEE_DataContext())
                 {
-                   
+
+                    db.Database.ExecuteSqlCommand("TRUNCATE TABLE [WeatherAndLoads]");
                     db.WeatherAndLoads.AddRange(finalData);
 
                     await db.SaveChangesAsync();

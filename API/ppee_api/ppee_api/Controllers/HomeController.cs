@@ -17,6 +17,16 @@ namespace ppee_api.Controllers
             this.service = service;
         }
 
+        [HttpPost,Route("api/home/training")]
+        public async Task<HttpResponseMessage> TrainModel()
+        {
+            if (await service.Training())
+                return Request.CreateResponse(HttpStatusCode.OK);
+
+            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured :)");
+            
+        }
+
         [HttpPost,Route("api/home/fileupload")]
         public async Task<HttpResponseMessage> FileUpload()
         {
@@ -37,8 +47,6 @@ namespace ppee_api.Controllers
                     {
                         if (await service.ReadFile(filestream))
                         {
-                            await service.Training();
-
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
                         else

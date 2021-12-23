@@ -20,15 +20,18 @@ namespace ppee_dataLayer.Entities
         public int Id { get; set; }
 
         public string Date { get; set; }
-        public double AirTemperature { get; set; }
-        public double AtmosphericPressure { get; set; }
-        public double PressureTendency { get; set; }
-        public double RelativeHumidity { get; set; }
-        public double MeanWindSpeed { get; set; }
-        public double MaxGustValue { get; set; }
-        public double TotalCloudCover { get; set; }
-        public double Visibility { get; set; }
-        public double DewPointTemperature { get; set; }
-        public long MWh { get; set; }
+        public float DayOfWeek { get; set; }
+        public float Hour { get; set; }
+        public float Month { get; set; }
+        public float AirTemperature { get; set; }
+        public float AtmosphericPressure { get; set; }
+        public float PressureTendency { get; set; }
+        public float RelativeHumidity { get; set; }
+        public float MeanWindSpeed { get; set; }
+        public float MaxGustValue { get; set; }
+        public float TotalCloudCover { get; set; }
+        public float Visibility { get; set; }
+        public float DewPointTemperature { get; set; }
+        public float MWh { get; set; }
     }
 }
