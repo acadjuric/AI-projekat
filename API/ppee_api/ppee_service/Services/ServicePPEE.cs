@@ -1,17 +1,16 @@
 ﻿using ExcelDataReader;
-using IronPython.Hosting;
-using Microsoft.Scripting.Hosting;
+using Numpy;
 using ppee_dataLayer.Entities;
 using ppee_dataLayer.Interfaces;
 using ppee_dataLayer.Services;
 using ppee_service.Interfaces;
+using ppee_service.MyKerasEntity;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -425,84 +424,149 @@ namespace ppee_service.Services
             IDatabase dataSloj = new DatabaseService();
             List<WeatherAndLoad> data = await dataSloj.LoadFromDataBase();
 
-            var minAirTemperature = data.Min(x => x.AirTemperature);
-            var maxAirTemperature = data.Max(x => x.AirTemperature);
+            List<List<float>> predictorData = KerasHelpers.ScaleDataSetAndGetPredictorData(data);
+            //moze ovako jer u metodi scale skaliram i MWh u opsegu 0-1
+            float[] predictedData = data.Select(x => x.MWh).ToArray();
 
-            var minHumidity = data.Min(x => x.RelativeHumidity);
-            var maxHumidity = data.Max(x => x.RelativeHumidity);
+            if (predictorData.Count != predictedData.Length)
+                return false;
 
-            var minAtmosphericPressure = data.Min(x => x.AtmosphericPressure);
-            var maxAtmosphericPressure = data.Max(x => x.AtmosphericPressure);
+            const float frac = 0.9f;
+            int trainCount = (int)Math.Round((data.Count * frac), 0);
 
-            var minPressureTendency = data.Min(x => x.PressureTendency);
-            var maxPressureTendency = data.Max(x => x.PressureTendency);
+            var predictorTraining = predictorData.Take(trainCount).ToList();
+            var predictorTest = predictorData.Skip(trainCount).ToList();
 
-            var minMeanWindSpeed = data.Min(x => x.MeanWindSpeed);
-            var maxMeanWindSpeed = data.Max(x => x.MeanWindSpeed);
-
-            var minMaxGustValue = data.Min(x => x.MaxGustValue);
-            var maxMaxGustValue = data.Max(x => x.MaxGustValue);
-
-            var minTotalCloudCover = data.Min(x => x.TotalCloudCover);
-            var maxTotalCloudCover = data.Max(x => x.TotalCloudCover);
-
-            var minVisibility = data.Min(x => x.Visibility);
-            var maxVisibility = data.Max(x => x.Visibility);
-
-            var minDewPointTemperature = data.Min(x => x.DewPointTemperature);
-            var maxDewPointTemperature = data.Max(x => x.DewPointTemperature);
-
-            var minMWh = data.Min(x => x.MWh);
-            var maxMWh = data.Max(x => x.MWh);
-
-
-            //za ovo ne treba traziti min i max
-            // dayOfWeek -> min:0 ; max:6 ; 0-nedelja ... 6-subota
-            // month -> min:1 ; max:12 ; 1-januar ... 12-decembar
-            // hour -> min:0 ; max:23
-            var minDayOfWeek = data.Min(x => x.DayOfWeek);
-            var maxDayOfWeek = data.Max(x => x.DayOfWeek);
-
-            var minMonth = data.Min(x => x.Month);
-            var maxMonth = data.Max(x => x.Month);
-
-            var minHour = data.Min(x => x.Hour);
-            var maxHour = data.Max(x => x.Hour);
+            float[] predictedTraining = predictedData.Take(trainCount).ToArray();
+            List<float> predictedTest = predictedData.Skip(trainCount).ToList();
 
             
+            float[,] matrixPredictorData = KerasHelpers.CreateMatrix(predictorTraining, predictorTraining.Count, predictorTraining[0].Count);
+            var NdPredictorData = np.array(matrixPredictorData);
+            var NdPredictedData = np.array(predictedTraining);
 
-            foreach (var item in data)
-            {
-                item.AirTemperature = NormalizeData(item.AirTemperature, minAirTemperature, maxAirTemperature);
-                item.AtmosphericPressure = NormalizeData(item.AtmosphericPressure, minAtmosphericPressure, maxAtmosphericPressure);
-                item.PressureTendency = NormalizeData(item.PressureTendency, minPressureTendency, maxPressureTendency);
-                item.MeanWindSpeed = NormalizeData(item.MeanWindSpeed, minMeanWindSpeed, maxMeanWindSpeed);
-                item.MaxGustValue = NormalizeData(item.MaxGustValue, minMaxGustValue, maxMaxGustValue);
-                item.RelativeHumidity = NormalizeData(item.RelativeHumidity, minHumidity, maxHumidity);
-                item.TotalCloudCover = NormalizeData(item.TotalCloudCover, minTotalCloudCover, maxTotalCloudCover);
-                item.Visibility = NormalizeData(item.Visibility, minVisibility, maxVisibility);
-                item.DewPointTemperature = NormalizeData(item.DewPointTemperature, minDewPointTemperature, maxDewPointTemperature);
-                item.MWh = NormalizeData(item.MWh, minMWh, maxMWh);
-                item.Hour = NormalizeData(item.Hour, minHour, maxHour);
-                item.Month = NormalizeData(item.Month, minMonth, maxMonth);
-                item.DayOfWeek = NormalizeData(item.DayOfWeek, minDayOfWeek, maxDayOfWeek);
-            }
+            int inputDim = predictorTest[0].Count;
+            MyKeras myKeras = new MyKeras(inputDim);
 
-           
+            var model = myKeras.TrainModel(NdPredictorData, NdPredictedData);
 
-            var a = "ACA";
+            float[,] matrixPredictorTest = KerasHelpers.CreateMatrix(predictorTest, predictorTest.Count, predictorTest[0].Count);
+            var NdPredictorTest = np.array(matrixPredictorTest).astype(np.float32);
+            var results = myKeras.Predict(NdPredictorTest);
+
+
+            predictedTest = KerasHelpers.InverseTransform_MWh(predictedTest);
+            results = KerasHelpers.InverseTransform_MWh(results);
+
+            double squareError = KerasHelpers.GetSquareDeviation(results, predictedTest);
+            double absoluteError = KerasHelpers.GetAbsoluteDeviation(results, predictedTest);
+
+
             return true;
 
         }
 
-        private float NormalizeData(float value, float min, float max)
-        {
-            return (value - min) / (max - min);
-        }
+        //private float[,] CreateMatrix(List<List<float>> predictorVariables, int rowCount, int columnCount)
+        //{
+        //    float[,] predVar = new float[rowCount, columnCount];
+        //    for(int i = 0; i< predictorVariables.Count; i++)
+        //    {
+        //        for(int j =0; j< predictorVariables[i].Count; j++)
+        //        {
+        //            predVar[i, j] = predictorVariables[i][j];
+        //        }
+        //    }
 
-        private float DeNormalizeData(float normalized, float min, float max)
-        {
-            return (normalized * (max - min) + min);
-        }
+        //    return predVar;
+        //}
+
+        //private float NormalizeData(float value, float min, float max)
+        //{
+        //    return (value - min) / (max - min);
+        //}
+
+        //private float DeNormalizeData(float normalized, float min, float max)
+        //{
+        //    return (normalized * (max - min) + min);
+        //}
+
+        //private List<List<float>> ScaleDataSetAndGetPredictorData(List<WeatherAndLoad> data)
+        //{
+        //    var minAirTemperature = data.Min(x => x.AirTemperature);
+        //    var maxAirTemperature = data.Max(x => x.AirTemperature);
+
+        //    var minHumidity = data.Min(x => x.RelativeHumidity);
+        //    var maxHumidity = data.Max(x => x.RelativeHumidity);
+
+        //    var minAtmosphericPressure = data.Min(x => x.AtmosphericPressure);
+        //    var maxAtmosphericPressure = data.Max(x => x.AtmosphericPressure);
+
+        //    var minPressureTendency = data.Min(x => x.PressureTendency);
+        //    var maxPressureTendency = data.Max(x => x.PressureTendency);
+
+        //    var minMeanWindSpeed = data.Min(x => x.MeanWindSpeed);
+        //    var maxMeanWindSpeed = data.Max(x => x.MeanWindSpeed);
+
+        //    var minMaxGustValue = data.Min(x => x.MaxGustValue);
+        //    var maxMaxGustValue = data.Max(x => x.MaxGustValue);
+
+        //    var minTotalCloudCover = data.Min(x => x.TotalCloudCover);
+        //    var maxTotalCloudCover = data.Max(x => x.TotalCloudCover);
+
+        //    var minVisibility = data.Min(x => x.Visibility);
+        //    var maxVisibility = data.Max(x => x.Visibility);
+
+        //    var minDewPointTemperature = data.Min(x => x.DewPointTemperature);
+        //    var maxDewPointTemperature = data.Max(x => x.DewPointTemperature);
+
+        //    var minMWh = data.Min(x => x.MWh);
+        //    var maxMWh = data.Max(x => x.MWh);
+
+
+        //    // ZA OVO NE TREBA TRAZITI MIN I MAX
+        //    // dayOfWeek -> min:0 ; max:6 ; 0-nedelja ... 6-subota
+        //    // month -> min:1 ; max:12 ; 1-januar ... 12-decembar
+        //    // hour -> min:0 ; max:23
+            
+        //    List<List<float>> predictorData = new List<List<float>>();
+
+        //    foreach (var item in data)
+        //    {
+        //        List<float> rowData = new List<float>();
+        //        //predictor
+        //        item.AirTemperature = NormalizeData(item.AirTemperature, minAirTemperature, maxAirTemperature);
+        //        item.AtmosphericPressure = NormalizeData(item.AtmosphericPressure, minAtmosphericPressure, maxAtmosphericPressure);
+        //        item.PressureTendency = NormalizeData(item.PressureTendency, minPressureTendency, maxPressureTendency);
+        //        item.MeanWindSpeed = NormalizeData(item.MeanWindSpeed, minMeanWindSpeed, maxMeanWindSpeed);
+        //        item.MaxGustValue = NormalizeData(item.MaxGustValue, minMaxGustValue, maxMaxGustValue);
+        //        item.RelativeHumidity = NormalizeData(item.RelativeHumidity, minHumidity, maxHumidity);
+        //        item.TotalCloudCover = NormalizeData(item.TotalCloudCover, minTotalCloudCover, maxTotalCloudCover);
+        //        item.Visibility = NormalizeData(item.Visibility, minVisibility, maxVisibility);
+        //        item.DewPointTemperature = NormalizeData(item.DewPointTemperature, minDewPointTemperature, maxDewPointTemperature);
+        //        item.Hour = NormalizeData(item.Hour, 0, 23);
+        //        item.Month = NormalizeData(item.Month, 1, 12);
+        //        item.DayOfWeek = NormalizeData(item.DayOfWeek, 0, 6);
+
+        //        rowData.Add(item.AirTemperature);
+        //        rowData.Add(item.AtmosphericPressure);
+        //        rowData.Add(item.PressureTendency);
+        //        rowData.Add(item.MeanWindSpeed);
+        //        rowData.Add(item.MaxGustValue);
+        //        rowData.Add(item.RelativeHumidity);
+        //        rowData.Add(item.TotalCloudCover);
+        //        rowData.Add(item.Visibility);
+        //        rowData.Add(item.DewPointTemperature);
+        //        rowData.Add(item.Hour);
+        //        rowData.Add(item.Month);
+        //        rowData.Add(item.DayOfWeek);
+
+        //        predictorData.Add(rowData);
+
+        //        //predicted
+        //        item.MWh = NormalizeData(item.MWh, minMWh, maxMWh);
+        //    }
+
+        //    return predictorData;
+        //}
     }
 }
