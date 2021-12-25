@@ -12,5 +12,7 @@ namespace ppee_service.Interfaces
         Task<bool> ReadFile(Stream stream);
 
         Task<bool> Training(string startDate, string endDate);
+
+        Task<bool> Predict(string startDate, int numberOfDays);
     }
 }

@@ -465,6 +465,20 @@ namespace ppee_service.Services
             return true;
 
         }
-        
+
+        public async Task<bool> Predict(string startDate, int numberOfDays)
+        {
+            
+            DateTime start = DateTime.Parse(startDate);
+            DateTime end = start.AddDays(numberOfDays);
+
+            IDatabase dataSloj = new DatabaseService();
+            List<WeatherAndLoad> data = await dataSloj.LoadFromDataBase();
+
+
+
+
+            return false;
+        }
     }
 }

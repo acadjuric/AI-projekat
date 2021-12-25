@@ -18,34 +18,31 @@ namespace ppee_api.Controllers
             this.service = service;
         }
 
-        [HttpPost,Route("api/home/training")]
+        [HttpPost, Route("api/home/training")]
         public async Task<HttpResponseMessage> TrainModel(Training model)
         {
             if (await service.Training(model.FromDate, model.ToDate))
                 return Request.CreateResponse<string>(HttpStatusCode.OK, "Training successfully completed");
 
             return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured");
-            
+
         }
 
         [HttpPost, Route("api/home/forecast")]
         public async Task<HttpResponseMessage> Forecast(Prediction model)
         {
-            if (model == null)
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured");
+            if (await service.Predict(model.StartDate, model.NumberOfDays))
+                return Request.CreateResponse<string>(HttpStatusCode.OK, "Training successfully completed");
 
-            //DateTime startDate = DateTime.Parse(model.StartDate);
-            //DateTime endDate = startDate.AddDays(model.NumberOfDays);
-
-            return Request.CreateResponse<string>(HttpStatusCode.OK, "YAY");
+            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured");
         }
 
-        [HttpPost,Route("api/home/fileupload")]
+        [HttpPost, Route("api/home/fileupload")]
         public async Task<HttpResponseMessage> FileUpload()
         {
             try
             {
-                
+
                 if (!Request.Content.IsMimeMultipartContent())
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, "UnsupportedMediaType");
