@@ -418,7 +418,7 @@ namespace ppee_service.Services
             return result;
         }
 
-        public async Task<bool> Training()
+        public async Task<bool> Training(string startDate, string endDate)
         {
 
             IDatabase dataSloj = new DatabaseService();

@@ -1,4 +1,5 @@
-﻿using ppee_service.Interfaces;
+﻿using ppee_api.Models;
+using ppee_service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +19,25 @@ namespace ppee_api.Controllers
         }
 
         [HttpPost,Route("api/home/training")]
-        public async Task<HttpResponseMessage> TrainModel()
+        public async Task<HttpResponseMessage> TrainModel(Training model)
         {
-            if (await service.Training())
-                return Request.CreateResponse(HttpStatusCode.OK);
+            if (await service.Training(model.FromDate, model.ToDate))
+                return Request.CreateResponse<string>(HttpStatusCode.OK, "Training successfully completed");
 
-            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured :)");
+            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured");
             
+        }
+
+        [HttpPost, Route("api/home/forecast")]
+        public async Task<HttpResponseMessage> Forecast(Prediction model)
+        {
+            if (model == null)
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured");
+
+            //DateTime startDate = DateTime.Parse(model.StartDate);
+            //DateTime endDate = startDate.AddDays(model.NumberOfDays);
+
+            return Request.CreateResponse<string>(HttpStatusCode.OK, "YAY");
         }
 
         [HttpPost,Route("api/home/fileupload")]

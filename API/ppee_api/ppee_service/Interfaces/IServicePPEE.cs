@@ -11,6 +11,6 @@ namespace ppee_service.Interfaces
     {
         Task<bool> ReadFile(Stream stream);
 
-        Task<bool> Training();
+        Task<bool> Training(string startDate, string endDate);
     }
 }
