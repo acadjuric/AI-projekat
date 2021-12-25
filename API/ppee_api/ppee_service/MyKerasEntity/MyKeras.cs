@@ -3,6 +3,7 @@ using Keras.Models;
 using Numpy;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,14 +13,20 @@ namespace ppee_service.MyKerasEntity
     public class MyKeras:KerasOptions
     {
 
-        private Sequential model = null;
+        private string path = string.Empty;
 
         public MyKeras(int inputDim):base()
         {
             this.InputDim = inputDim;
-            model = null;
-        }
 
+            string path = AppDomain.CurrentDomain.BaseDirectory;
+            char[] charsToTrim = { '\\', ' ' };
+            path = path.TrimEnd(charsToTrim);
+            path = path.Substring(0, path.LastIndexOf('\\'));
+            path += "\\TrainedModels\\";
+
+            this.path = path;
+        }
 
         public Sequential TrainModel(NDarray predictorData, NDarray predictedData)
         {
@@ -32,22 +39,32 @@ namespace ppee_service.MyKerasEntity
             //ovde trenira, nakon ovoga model je spreman za cuvanje
             model.Fit(predictorData, predictedData, epochs: this.EpochNumber, batch_size: this.BatchSize, verbose: this.Verbose);
 
-            this.model = model;
+
+
+            if (!this.path.Equals(string.Empty))
+            {
+                string jsonModel = model.ToJson();
+                File.WriteAllText(this.path + "model.json", jsonModel);
+                model.SaveWeight(this.path + "model.h5");
+            }
+
+
             return model;
         }
 
         private BaseModel LoadModel()
         {
-            //ucitaj model iz fajla i vrati ga
+            var model = Sequential.ModelFromJson(File.ReadAllText(this.path + "model.json"));
+            model.LoadWeight(this.path + "model.h5");
             
-            return null;
+            return model;
         }
 
         public List<float> Predict(NDarray predictorTest)
         {
-            // var model = LoadModel();
+            var model = LoadModel();
 
-            var result = this.model.Predict(predictorTest);
+            var result = model.Predict(predictorTest);
 
             return KerasHelpers.NDarrayToList(result);
         }
@@ -67,7 +84,6 @@ namespace ppee_service.MyKerasEntity
 
             model.Add(new Dense(1, kernel_initializer: this.KernelInitializer));
 
-            this.model = model;
             return model;
         }
     }
