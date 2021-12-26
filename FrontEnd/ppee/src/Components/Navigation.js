@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import imgFile from '../assets/file.png'
+import imgFile from '../assets/file.png';
+import nn from '../assets/nn.jpg';
 
 
 class Navigation extends Component {
@@ -53,7 +54,7 @@ class Navigation extends Component {
 
                     <li className={this.state.tab_index === "2" ? "list active" : "list"} onClick={this.handleOnClick} name="2">
                         <Link className="aLink" to="/training" name="2">
-                            <span className="icon" name="2" ><img src={imgFile} alt="img" name="2" /></span>
+                            <span className="icon" name="2" ><img src={nn} alt="img" name="2" /></span>
                             <span className={this.state.tab_index === "2" ? "text" : "hide"} name="2" > Training </span>
                         </Link>
                     </li>

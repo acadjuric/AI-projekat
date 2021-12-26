@@ -13,7 +13,13 @@ class Training extends Component {
 
     handleTraining = () => {
         
-        axios.post(baseUrl + "home/training", this.state).then(response => {
+        //backend model props start wiht uppercase character
+        var body ={
+            FromDate: this.state.fromDate,
+            ToDate: this.state.toDate,
+        }
+
+        axios.post(baseUrl + "home/training", body).then(response => {
 
             console.log("Stiglo je od treninga-> ", response.data);
 
@@ -44,8 +50,8 @@ class Training extends Component {
                     <span>To date <input id="toDate" type="date" onChange={this.onDateChange} /> </span>
                 </div>
 
-                <div className="trainBtn_container">
-                    <button id='trainBtn' onClick={this.handleTraining}>Training</button>
+                <div className="btn_container btn_train">
+                    <button className='btn' onClick={this.handleTraining}>Training</button>
                 </div>
             </div>
         );
