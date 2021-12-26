@@ -10,29 +10,7 @@ namespace ppee_service.MyKerasEntity
 {
     public static class KerasHelpers
     {
-        #region static Min Max properties
-        public static float minAirTemperature { get; set; }
-        public static float maxAirTemperature { get; set; }
-        public static float minHumidity { get; set; }
-        public static float maxHumidity { get; set; }
-        public static float minAtmosphericPressure { get; set; }
-        public static float maxAtmosphericPressure { get; set; }
-        public static float minPressureTendency { get; set; }
-        public static float maxPressureTendency { get; set; }
-        public static float minMeanWindSpeed { get; set; }
-        public static float maxMeanWindSpeed { get; set; }
-        public static float minMaxGustValue { get; set; }
-        public static float maxMaxGustValue { get; set; }
-        public static float minTotalCloudCover { get; set; }
-        public static float maxTotalCloudCover { get; set; }
-        public static float minVisibility { get; set; }
-        public static float maxVisibility { get; set; }
-        public static float minDewPointTemperature { get; set; }
-        public static float maxDewPointTemperature { get; set; }
-        public static float minMWh { get; set; }
-        public static float maxMWh { get; set; }
-        #endregion
-
+        
         public static List<float> NDarrayToList(NDarray array)
         {
             List<float> retVal = new List<float>();
@@ -67,62 +45,78 @@ namespace ppee_service.MyKerasEntity
             return (normalized * (max - min) + min);
         }
 
-        public static List<List<float>> ScaleDataSetAndGetPredictorData(List<WeatherAndLoad> data)
+        public static MinMaxValues FindMinAndMaxValues(List<WeatherAndLoad> data)
         {
-            minAirTemperature = data.Min(x => x.AirTemperature);
-            maxAirTemperature = data.Max(x => x.AirTemperature);
+            MinMaxValues minMaxValues = new MinMaxValues();
 
-            minHumidity = data.Min(x => x.RelativeHumidity);
-            maxHumidity = data.Max(x => x.RelativeHumidity);
+            minMaxValues.MinAirTemperature = data.Min(x => x.AirTemperature);
+            minMaxValues.MaxAirTemperature = data.Max(x => x.AirTemperature);
 
-            minAtmosphericPressure = data.Min(x => x.AtmosphericPressure);
-            maxAtmosphericPressure = data.Max(x => x.AtmosphericPressure);
+            minMaxValues.MinHumidity = data.Min(x => x.RelativeHumidity);
+            minMaxValues.MaxHumidity = data.Max(x => x.RelativeHumidity);
 
-            minPressureTendency = data.Min(x => x.PressureTendency);
-            maxPressureTendency = data.Max(x => x.PressureTendency);
+            minMaxValues.MinAtmosphericPressure = data.Min(x => x.AtmosphericPressure);
+            minMaxValues.MaxAtmosphericPressure = data.Max(x => x.AtmosphericPressure);
 
-            minMeanWindSpeed = data.Min(x => x.MeanWindSpeed);
-            maxMeanWindSpeed = data.Max(x => x.MeanWindSpeed);
+            minMaxValues.MinPressureTendency = data.Min(x => x.PressureTendency);
+            minMaxValues.MaxPressureTendency = data.Max(x => x.PressureTendency);
 
-            minMaxGustValue = data.Min(x => x.MaxGustValue);
-            maxMaxGustValue = data.Max(x => x.MaxGustValue);
+            minMaxValues.MinMeanWindSpeed = data.Min(x => x.MeanWindSpeed);
+            minMaxValues.MaxMeanWindSpeed = data.Max(x => x.MeanWindSpeed);
 
-            minTotalCloudCover = data.Min(x => x.TotalCloudCover);
-            maxTotalCloudCover = data.Max(x => x.TotalCloudCover);
+            minMaxValues.MinMaxGustValue = data.Min(x => x.MaxGustValue);
+            minMaxValues.MaxMaxGustValue = data.Max(x => x.MaxGustValue);
 
-            minVisibility = data.Min(x => x.Visibility);
-            maxVisibility = data.Max(x => x.Visibility);
+            minMaxValues.MinTotalCloudCover = data.Min(x => x.TotalCloudCover);
+            minMaxValues.MaxTotalCloudCover = data.Max(x => x.TotalCloudCover);
 
-            minDewPointTemperature = data.Min(x => x.DewPointTemperature);
-            maxDewPointTemperature = data.Max(x => x.DewPointTemperature);
+            minMaxValues.MinVisibility = data.Min(x => x.Visibility);
+            minMaxValues.MaxVisibility = data.Max(x => x.Visibility);
 
-            minMWh = data.Min(x => x.MWh);
-            maxMWh = data.Max(x => x.MWh);
+            minMaxValues.MinDewPointTemperature = data.Min(x => x.DewPointTemperature);
+            minMaxValues.MaxDewPointTemperature = data.Max(x => x.DewPointTemperature);
 
+            minMaxValues.MinMWh = data.Min(x => x.MWh);
+            minMaxValues.MaxMWh = data.Max(x => x.MWh);
 
             // ZA OVO NE TREBA TRAZITI MIN I MAX
             // dayOfWeek -> min:0 ; max:6 ; 0-nedelja ... 6-subota
             // month -> min:1 ; max:12 ; 1-januar ... 12-decembar
             // hour -> min:0 ; max:23
 
+            minMaxValues.MinHour = 0;
+            minMaxValues.MaxHour = 23;
+            
+            minMaxValues.MinMonth = 1;
+            minMaxValues.MaxMonth = 12;
+
+            minMaxValues.MinDayOfWeek = 0; //nedelja
+            minMaxValues.MaxDayOfWeek = 6; //subota
+
+            return minMaxValues;
+        }
+
+        public static List<List<float>> ScaleDataSetAndGetPredictorData(List<WeatherAndLoad> data, MinMaxValues minMaxValues)
+        {
+            
             List<List<float>> predictorData = new List<List<float>>();
 
             foreach (var item in data)
             {
                 List<float> rowData = new List<float>();
                 //predictor
-                item.AirTemperature = NormalizeData(item.AirTemperature, minAirTemperature, maxAirTemperature);
-                item.AtmosphericPressure = NormalizeData(item.AtmosphericPressure, minAtmosphericPressure, maxAtmosphericPressure);
-                item.PressureTendency = NormalizeData(item.PressureTendency, minPressureTendency, maxPressureTendency);
-                item.MeanWindSpeed = NormalizeData(item.MeanWindSpeed, minMeanWindSpeed, maxMeanWindSpeed);
-                item.MaxGustValue = NormalizeData(item.MaxGustValue, minMaxGustValue, maxMaxGustValue);
-                item.RelativeHumidity = NormalizeData(item.RelativeHumidity, minHumidity, maxHumidity);
-                item.TotalCloudCover = NormalizeData(item.TotalCloudCover, minTotalCloudCover, maxTotalCloudCover);
-                item.Visibility = NormalizeData(item.Visibility, minVisibility, maxVisibility);
-                item.DewPointTemperature = NormalizeData(item.DewPointTemperature, minDewPointTemperature, maxDewPointTemperature);
-                item.Hour = NormalizeData(item.Hour, 0, 23);
-                item.Month = NormalizeData(item.Month, 1, 12);
-                item.DayOfWeek = NormalizeData(item.DayOfWeek, 0, 6);
+                item.AirTemperature = NormalizeData(item.AirTemperature, minMaxValues.MinAirTemperature, minMaxValues.MaxAirTemperature);
+                item.AtmosphericPressure = NormalizeData(item.AtmosphericPressure, minMaxValues.MinAtmosphericPressure, minMaxValues.MaxAtmosphericPressure);
+                item.PressureTendency = NormalizeData(item.PressureTendency, minMaxValues.MinPressureTendency, minMaxValues.MaxPressureTendency);
+                item.MeanWindSpeed = NormalizeData(item.MeanWindSpeed, minMaxValues.MinMeanWindSpeed, minMaxValues.MaxMeanWindSpeed);
+                item.MaxGustValue = NormalizeData(item.MaxGustValue, minMaxValues.MinMaxGustValue, minMaxValues.MaxMaxGustValue);
+                item.RelativeHumidity = NormalizeData(item.RelativeHumidity, minMaxValues.MinHumidity, minMaxValues.MaxHumidity);
+                item.TotalCloudCover = NormalizeData(item.TotalCloudCover, minMaxValues.MinTotalCloudCover, minMaxValues.MaxTotalCloudCover);
+                item.Visibility = NormalizeData(item.Visibility, minMaxValues.MinVisibility, minMaxValues.MaxVisibility);
+                item.DewPointTemperature = NormalizeData(item.DewPointTemperature, minMaxValues.MinDewPointTemperature, minMaxValues.MaxDewPointTemperature);
+                item.Hour = NormalizeData(item.Hour, minMaxValues.MinHour, minMaxValues.MaxHour);
+                item.Month = NormalizeData(item.Month, minMaxValues.MinMonth, minMaxValues.MaxMonth);
+                item.DayOfWeek = NormalizeData(item.DayOfWeek, minMaxValues.MinDayOfWeek, minMaxValues.MaxDayOfWeek);
 
                 rowData.Add(item.AirTemperature);
                 rowData.Add(item.AtmosphericPressure);
@@ -140,7 +134,7 @@ namespace ppee_service.MyKerasEntity
                 predictorData.Add(rowData);
 
                 //predicted
-                item.MWh = NormalizeData(item.MWh, minMWh, maxMWh);
+                item.MWh = NormalizeData(item.MWh, minMaxValues.MinMWh, minMaxValues.MaxMWh);
             }
 
             return predictorData;
@@ -173,15 +167,15 @@ namespace ppee_service.MyKerasEntity
                 temp.Add(Math.Abs((actualValues[i] - forecastValues[i]) / actualValues[i]));
             }
 
-            return temp.Average();
+            return temp.Average() * 100;
         }
 
-        public static List<float> InverseTransform_MWh(List<float> scaledData)
+        public static List<float> InverseTransform_MWh(List<float> scaledData, MinMaxValues minMaxValues)
         {
             List<float> retVal = new List<float>();
             foreach (var item in scaledData)
             {
-                retVal.Add(DeNormalizeData(item, minMWh, maxMWh));
+                retVal.Add(DeNormalizeData(item, minMaxValues.MinMWh, minMaxValues.MaxMWh));
             }
 
             return retVal;

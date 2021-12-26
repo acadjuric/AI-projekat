@@ -31,8 +31,10 @@ namespace ppee_api.Controllers
         [HttpPost, Route("api/home/forecast")]
         public async Task<HttpResponseMessage> Forecast(Prediction model)
         {
-            if (await service.Predict(model.StartDate, model.NumberOfDays))
-                return Request.CreateResponse<string>(HttpStatusCode.OK, "Training successfully completed");
+            Tuple<double, double> retVal = await service.Predict(model.StartDate, model.NumberOfDays);
+
+            if (retVal.Item1 != -1 && retVal.Item2 != -1)
+                return Request.CreateResponse<Tuple<double,double>>(HttpStatusCode.OK, retVal);
 
             return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured");
         }

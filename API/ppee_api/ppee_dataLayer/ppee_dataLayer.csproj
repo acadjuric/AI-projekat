@@ -70,12 +70,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Load.cs" />
+    <Compile Include="Entities\MinMaxValues.cs" />
     <Compile Include="Entities\Weather.cs" />
     <Compile Include="Entities\WeatherAndLoad.cs" />
     <Compile Include="Interfaces\IDatabase.cs" />
     <Compile Include="Migrations\202112232247189_initial.cs" />
     <Compile Include="Migrations\202112232247189_initial.designer.cs">
       <DependentUpon>202112232247189_initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202112261628007_table_for_min_max_values.cs" />
+    <Compile Include="Migrations\202112261628007_table_for_min_max_values.designer.cs">
+      <DependentUpon>202112261628007_table_for_min_max_values.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PPEE_DataContext.cs" />
@@ -89,6 +94,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202112232247189_initial.resx">
       <DependentUpon>202112232247189_initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202112261628007_table_for_min_max_values.resx">
+      <DependentUpon>202112261628007_table_for_min_max_values.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -28,14 +28,50 @@ namespace ppee_dataLayer.Services
             }
         }
 
+        public async Task<MinMaxValues> LoadMinMaxValues()
+        {
+            try
+            {
+                using(var db = new PPEE_DataContext())
+                {
+                    return await db.MinMaxValues.FirstAsync();
+                }
+
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> UpdateMinMaxValues(MinMaxValues value)
+        {
+            try
+            {
+                using(var db = new PPEE_DataContext())
+                {
+                    if(db.MinMaxValues.ToList().Count > 0)
+                        db.MinMaxValues.Remove(await db.MinMaxValues.FirstAsync());
+
+                    db.MinMaxValues.Add(value);
+
+                    await db.SaveChangesAsync();
+
+                    return true;
+                }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<bool> WriteToDataBase(List<WeatherAndLoad> finalData)
         {
             try
             {
                 using (var db = new PPEE_DataContext())
                 {
-
-                    db.Database.ExecuteSqlCommand("TRUNCATE TABLE [WeatherAndLoads]");
                     db.WeatherAndLoads.AddRange(finalData);
 
                     await db.SaveChangesAsync();

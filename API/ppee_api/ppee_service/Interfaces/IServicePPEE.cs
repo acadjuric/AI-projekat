@@ -13,6 +13,6 @@ namespace ppee_service.Interfaces
 
         Task<bool> Training(string startDate, string endDate);
 
-        Task<bool> Predict(string startDate, int numberOfDays);
+        Task<Tuple<double, double>> Predict(string startDate, int numberOfDays);
     }
 }

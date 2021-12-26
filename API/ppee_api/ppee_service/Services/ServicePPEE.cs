@@ -244,10 +244,20 @@ namespace ppee_service.Services
 
                 }
 
-                List<WeatherAndLoad> finalData = new List<WeatherAndLoad>();
+                //Svaki ucitan fajl je dodavanje u bazu,
+                //Dakle ovde ucitaj iz baze ono sto vec ima
+                // provera da li postoji je po atributu finalData.exist(x=> x.date.equals(item.date));
+                List<WeatherAndLoad> finalData = await dataSloj.LoadFromDataBase();
+                int countFromDataBase = finalData.Count;
+
 
                 foreach (var item in weathers)
                 {
+                    //ako vec postoji u bazi, preskoci ga
+                    // postoji ako su isti datum i vreme
+                    if (finalData.Exists(x => x.Date.Equals(item.Date)))
+                        continue;
+
                     // ITEM DATE -> dan.mesec.godina sat:minut;
                     string[] parts = item.Date.Split(' ');
                     string time = parts[1];
@@ -287,11 +297,11 @@ namespace ppee_service.Services
                     brojac = finalData.Count;
                 }
 
+                bool retval = await dataSloj.WriteToDataBase(finalData.Skip(countFromDataBase).ToList());
+                bool min_max_retval = await dataSloj.UpdateMinMaxValues(KerasHelpers.FindMinAndMaxValues(finalData));
 
-                bool retval = await dataSloj.WriteToDataBase(finalData);
+                return retval && min_max_retval ? true : false;
 
-
-                return retval;
             }
             catch (Exception ex)
             {
@@ -420,65 +430,106 @@ namespace ppee_service.Services
 
         public async Task<bool> Training(string startDate, string endDate)
         {
+            try
+            {
+                //DateTime start = DateTime.ParseExact(startDate, "d/M/yyyy", CultureInfo.InvariantCulture);
+                //DateTime end = DateTime.ParseExact(endDate, "d/M/yyyy", CultureInfo.InvariantCulture);
 
-            IDatabase dataSloj = new DatabaseService();
-            List<WeatherAndLoad> data = await dataSloj.LoadFromDataBase();
+                IDatabase dataSloj = new DatabaseService();
+                List<WeatherAndLoad> data = await dataSloj.LoadFromDataBase();
+                MinMaxValues minMaxValues = await dataSloj.LoadMinMaxValues();
 
-            List<List<float>> predictorData = KerasHelpers.ScaleDataSetAndGetPredictorData(data);
-            //moze ovako jer u metodi scale skaliram i MWh u opsegu 0-1
-            float[] predictedData = data.Select(x => x.MWh).ToArray();
+                //NEKAKO ISCUPATI IZ SVIH PODATAKA SAMO ONE KOJI SU U OPSEGU PROSLEDjENIH DATUMA
 
-            if (predictorData.Count != predictedData.Length)
-                return false;
+                List<List<float>> predictorData = KerasHelpers.ScaleDataSetAndGetPredictorData(data, minMaxValues);
+                //moze ovako jer u metodi scale skaliram i MWh u opsegu 0-1
+                float[] predictedData = data.Select(x => x.MWh).ToArray();
 
-            const float frac = 0.9f;
-            int trainCount = (int)Math.Round((data.Count * frac), 0);
+                if (predictorData.Count != predictedData.Length)
+                    return false;
 
-            var predictorTraining = predictorData.Take(trainCount).ToList();
-            var predictorTest = predictorData.Skip(trainCount).ToList();
+                const float frac = 0.9f;
+                int trainCount = (int)Math.Round((data.Count * frac), 0);
 
-            float[] predictedTraining = predictedData.Take(trainCount).ToArray();
-            List<float> predictedTest = predictedData.Skip(trainCount).ToList();
+                var predictorTraining = predictorData.Take(trainCount).ToList();
+                //var predictorTest = predictorData.Skip(trainCount).ToList();
 
-            
-            float[,] matrixPredictorData = KerasHelpers.CreateMatrix(predictorTraining, predictorTraining.Count, predictorTraining[0].Count);
-            var NdPredictorData = np.array(matrixPredictorData);
-            var NdPredictedData = np.array(predictedTraining);
+                float[] predictedTraining = predictedData.Take(trainCount).ToArray();
+                //List<float> predictedTest = predictedData.Skip(trainCount).ToList();
 
-            int inputDim = predictorTest[0].Count;
-            MyKeras myKeras = new MyKeras(inputDim);
+                float[,] matrixPredictorData = KerasHelpers.CreateMatrix(predictorTraining, predictorTraining.Count, predictorTraining[0].Count);
+                var NdPredictorData = np.array(matrixPredictorData);
+                var NdPredictedData = np.array(predictedTraining);
 
-            var model = myKeras.TrainModel(NdPredictorData, NdPredictedData);
+                int inputDim = predictorTraining[0].Count;
+                MyKeras myKeras = new MyKeras(inputDim);
 
-            float[,] matrixPredictorTest = KerasHelpers.CreateMatrix(predictorTest, predictorTest.Count, predictorTest[0].Count);
-            var NdPredictorTest = np.array(matrixPredictorTest).astype(np.float32);
-            var results = myKeras.Predict(NdPredictorTest);
+                var model = myKeras.TrainModel(NdPredictorData, NdPredictedData);
 
-
-            predictedTest = KerasHelpers.InverseTransform_MWh(predictedTest);
-            results = KerasHelpers.InverseTransform_MWh(results);
-
-            double squareError = KerasHelpers.GetSquareDeviation(results, predictedTest);
-            double absoluteError = KerasHelpers.GetAbsoluteDeviation(results, predictedTest);
-
-
-            return true;
-
+                return true;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
-        public async Task<bool> Predict(string startDate, int numberOfDays)
+        public async Task<Tuple<double, double>> Predict(string startDate, int numberOfDays)
         {
-            
-            DateTime start = DateTime.Parse(startDate);
-            DateTime end = start.AddDays(numberOfDays);
 
-            IDatabase dataSloj = new DatabaseService();
-            List<WeatherAndLoad> data = await dataSloj.LoadFromDataBase();
-
+            try
+            {
+                //DateTime start = DateTime.ParseExact(startDate, "d/M/yyyy", CultureInfo.InvariantCulture);
+                //DateTime end = start.AddDays(numberOfDays);
 
 
 
-            return false;
+                IDatabase dataSloj = new DatabaseService();
+                List<WeatherAndLoad> data = await dataSloj.LoadFromDataBase();
+                MinMaxValues minMaxValues = await dataSloj.LoadMinMaxValues();
+
+                //NEKAKO ISCUPATI IZ SVIH PODATAKA SAMO ONE KOJI SU U OPSEGU PROSLEDjENIH DATUMA
+
+                List<List<float>> predictorData = KerasHelpers.ScaleDataSetAndGetPredictorData(data, minMaxValues);
+                //moze ovako jer u metodi scale skaliram i MWh u opsegu 0-1
+                float[] predictedData = data.Select(x => x.MWh).ToArray();
+
+                if (predictorData.Count != predictedData.Length)
+                    return new Tuple<double, double>(-1, -1);
+
+                const float frac = 0.9f;
+                int trainCount = (int)Math.Round((data.Count * frac), 0);
+
+                //ovo je ulaz u model, nezavisni podaci, temp, cloud, humidity...
+                var predictorTest = predictorData.Skip(trainCount).ToList();
+
+                //ovo je ono sto se ocekuje na izlazu, MWh
+                List<float> predictedTest = predictedData.Skip(trainCount).ToList();
+
+                float[,] matrixPredictorTest = KerasHelpers.CreateMatrix(predictorTest, predictorTest.Count, predictorTest[0].Count);
+                var NdPredictorTest = np.array(matrixPredictorTest).astype(np.float32);
+
+
+                int inputDim = predictorTest[0].Count;
+                MyKeras myKeras = new MyKeras(inputDim);
+
+                var results = myKeras.Predict(NdPredictorTest);
+
+
+                predictedTest = KerasHelpers.InverseTransform_MWh(predictedTest, minMaxValues);
+                results = KerasHelpers.InverseTransform_MWh(results, minMaxValues);
+
+                double squareError = KerasHelpers.GetSquareDeviation(results, predictedTest);
+                double absoluteError = KerasHelpers.GetAbsoluteDeviation(results, predictedTest);
+
+                Tuple<double, double> retVal = new Tuple<double, double>(squareError, absoluteError);
+
+                return retVal;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

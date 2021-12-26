@@ -12,5 +12,9 @@ namespace ppee_dataLayer.Interfaces
         Task<bool> WriteToDataBase(List<WeatherAndLoad> finalData);
 
         Task<List<WeatherAndLoad>> LoadFromDataBase();
+
+        Task<MinMaxValues> LoadMinMaxValues();
+
+        Task<bool> UpdateMinMaxValues(MinMaxValues value);
     }
 }
