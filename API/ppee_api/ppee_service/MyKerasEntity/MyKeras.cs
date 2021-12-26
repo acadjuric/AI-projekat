@@ -45,30 +45,44 @@ namespace ppee_service.MyKerasEntity
             //ovde trenira, nakon ovoga model je spreman za cuvanje
             model.Fit(predictorData, predictedData, epochs: this.EpochNumber, batch_size: this.BatchSize, verbose: this.Verbose);
 
-
-
-            if (!this.path.Equals(string.Empty))
-            {
-                string jsonModel = model.ToJson();
-                File.WriteAllText(this.path + "model.json", jsonModel);
-                model.SaveWeight(this.path + "model.h5");
-            }
-
-
             return model;
+        }
+
+        public void SaveModel(Sequential model, string mapeError)
+        {
+            if (!this.path.Equals(string.Empty) && double.Parse(mapeError) < 11)
+            {
+                if (mapeError.Contains('.'))
+                    mapeError = mapeError.Replace('.', '_');
+                else if (mapeError.Contains(','))
+                    mapeError = mapeError.Replace(',', '_');
+
+                string modelName = "model_" + mapeError;
+
+                string jsonModel = model.ToJson();
+                File.WriteAllText(this.path + modelName +".json", jsonModel);
+                model.SaveWeight(this.path + modelName +".h5");
+            }
         }
 
         private BaseModel LoadModel()
         {
-            var model = Sequential.ModelFromJson(File.ReadAllText(this.pathToBestModel + "model.json"));
-            model.LoadWeight(this.pathToBestModel + "model.h5");
-            
-            return model;
+            if (!this.pathToBestModel.Equals(string.Empty))
+            {
+                var model = Sequential.ModelFromJson(File.ReadAllText(this.pathToBestModel + "model.json"));
+                model.LoadWeight(this.pathToBestModel + "model.h5");
+
+                return model;
+            }
+            return null;
         }
 
         public List<float> Predict(NDarray predictorTest)
         {
+
             var model = LoadModel();
+
+            if (model == null) return null;
 
             var result = model.Predict(predictorTest);
 

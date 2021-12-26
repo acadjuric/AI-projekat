@@ -33,7 +33,7 @@ namespace ppee_api.Controllers
         {
             Tuple<double, double> retVal = await service.Predict(model.StartDate, model.NumberOfDays);
 
-            if (retVal.Item1 != -1 && retVal.Item2 != -1)
+            if (retVal != null)
                 return Request.CreateResponse<Tuple<double,double>>(HttpStatusCode.OK, retVal);
 
             return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured");

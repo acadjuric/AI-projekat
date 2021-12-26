@@ -439,6 +439,11 @@ namespace ppee_service.Services
                 List<WeatherAndLoad> data = await dataSloj.LoadFromDataBase();
                 MinMaxValues minMaxValues = await dataSloj.LoadMinMaxValues();
 
+                //testiranje treninga za razne modele 
+                    //data = data.Take(3000).ToList();
+                //end testiranje
+
+
                 //NEKAKO ISCUPATI IZ SVIH PODATAKA SAMO ONE KOJI SU U OPSEGU PROSLEDjENIH DATUMA
 
                 List<List<float>> predictorData = KerasHelpers.ScaleDataSetAndGetPredictorData(data, minMaxValues);
@@ -452,10 +457,10 @@ namespace ppee_service.Services
                 int trainCount = (int)Math.Round((data.Count * frac), 0);
 
                 var predictorTraining = predictorData.Take(trainCount).ToList();
-                //var predictorTest = predictorData.Skip(trainCount).ToList();
+                var predictorTest = predictorData.Skip(trainCount).ToList();
 
                 float[] predictedTraining = predictedData.Take(trainCount).ToArray();
-                //List<float> predictedTest = predictedData.Skip(trainCount).ToList();
+                List<float> predictedTest = predictedData.Skip(trainCount).ToList();
 
                 float[,] matrixPredictorData = KerasHelpers.CreateMatrix(predictorTraining, predictorTraining.Count, predictorTraining[0].Count);
                 var NdPredictorData = np.array(matrixPredictorData);
@@ -465,6 +470,24 @@ namespace ppee_service.Services
                 MyKeras myKeras = new MyKeras(inputDim);
 
                 var model = myKeras.TrainModel(NdPredictorData, NdPredictedData);
+
+
+                //predikicija zbog cuvanja modela sa apsolutno greskom
+                float[,] matrixPredictorTest = KerasHelpers.CreateMatrix(predictorTest, predictorTest.Count, predictorTest[0].Count);
+                var NdPredictorTest = np.array(matrixPredictorTest).astype(np.float32);
+
+                var predictionValues = model.Predict(NdPredictorTest);
+
+                var results = KerasHelpers.NDarrayToList(predictionValues);
+
+                predictedTest = KerasHelpers.InverseTransform_MWh(predictedTest, minMaxValues);
+                results = KerasHelpers.InverseTransform_MWh(results, minMaxValues);
+
+                double squareError = KerasHelpers.GetSquareDeviation(results, predictedTest);
+                double absoluteError = KerasHelpers.GetAbsoluteDeviation(results, predictedTest);
+
+                //cuvanje treniranog modela -> model_mapeError.( json | h5)
+                myKeras.SaveModel(model, Math.Round(absoluteError,2).ToString() );
 
                 return true;
             }
@@ -495,7 +518,7 @@ namespace ppee_service.Services
                 float[] predictedData = data.Select(x => x.MWh).ToArray();
 
                 if (predictorData.Count != predictedData.Length)
-                    return new Tuple<double, double>(-1, -1);
+                    return null;
 
                 const float frac = 0.9f;
                 int trainCount = (int)Math.Round((data.Count * frac), 0);
@@ -515,6 +538,7 @@ namespace ppee_service.Services
 
                 var results = myKeras.Predict(NdPredictorTest);
 
+                if (results == null) return null;
 
                 predictedTest = KerasHelpers.InverseTransform_MWh(predictedTest, minMaxValues);
                 results = KerasHelpers.InverseTransform_MWh(results, minMaxValues);
