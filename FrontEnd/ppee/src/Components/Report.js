@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { baseUrl } from '../constants';
+import axios from 'axios';
 
 const days = [1, 2, 3, 4, 5, 6, 7]
 
@@ -32,7 +34,21 @@ class Report extends Component {
     }
 
     handlePredict = () => {
-        console.log(this.state);
+        //backend model props start wiht uppercase character
+        var body ={
+            StartDate: this.state.fromDate,
+            NumberOfDays: this.state.numberOfDays,
+        }
+
+        console.log(body);
+
+        axios.post(baseUrl + "home/forecast", body).then(response => {
+
+            console.log("Stiglo je od predicta-> ", response.data);
+
+        }).catch(error => {
+            console.log(error);
+        })
     }
 
     render() {
