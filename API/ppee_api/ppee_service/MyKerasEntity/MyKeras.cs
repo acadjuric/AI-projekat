@@ -12,8 +12,11 @@ namespace ppee_service.MyKerasEntity
 {
     public class MyKeras:KerasOptions
     {
-
+        //path -> saving trained models
         private string path = string.Empty;
+
+        //pathToBestModel -> load best trained model from separate folder
+        private string pathToBestModel = string.Empty;
 
         public MyKeras(int inputDim):base()
         {
@@ -23,8 +26,11 @@ namespace ppee_service.MyKerasEntity
             char[] charsToTrim = { '\\', ' ' };
             path = path.TrimEnd(charsToTrim);
             path = path.Substring(0, path.LastIndexOf('\\'));
+            this.pathToBestModel = path;
+
             path += "\\TrainedModels\\";
 
+            this.pathToBestModel += "\\BestModel\\";
             this.path = path;
         }
 
@@ -54,8 +60,8 @@ namespace ppee_service.MyKerasEntity
 
         private BaseModel LoadModel()
         {
-            var model = Sequential.ModelFromJson(File.ReadAllText(this.path + "model.json"));
-            model.LoadWeight(this.path + "model.h5");
+            var model = Sequential.ModelFromJson(File.ReadAllText(this.pathToBestModel + "model.json"));
+            model.LoadWeight(this.pathToBestModel + "model.h5");
             
             return model;
         }
