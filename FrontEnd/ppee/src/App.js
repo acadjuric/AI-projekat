@@ -14,7 +14,7 @@ function App() {
           <Route path='/' element={<FileUpload />} />
           <Route path="/file-upload" element={<FileUpload />} />
           <Route path="/training" element={<Training />} />
-          <Route path="/report" element={<Report />} />
+          <Route path="/prediction" element={<Report />} />
         </Routes>
 
         

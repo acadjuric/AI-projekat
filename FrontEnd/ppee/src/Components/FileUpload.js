@@ -22,19 +22,19 @@ class FileUpload extends Component {
     handleCustomBtnClick = () => {
 
         this.inputFileRef.current.click();
-        
+
     }
 
-    handleUploadBtnClick =()=>{
-        if(this.state.file === null || this.state.fileName === "") return;
+    handleUploadBtnClick = () => {
+        if (this.state.file === null || this.state.fileName === "") return;
 
         var form = new FormData();
         form.append("file", this.state.file, this.state.fileName);
-        axios.post(baseUrl+"home/fileupload", form).then(response=>{
+        axios.post(baseUrl + "home/fileupload", form).then(response => {
 
             console.log("Stiglo je od servera-> ", response.data);
 
-        }).catch(error=>{
+        }).catch(error => {
             console.log(error);
         })
     }
@@ -105,8 +105,15 @@ class FileUpload extends Component {
                     </div>
 
                     <input id="default-btn" type="file" hidden={true} ref={this.inputFileRef} onChange={this.handleFileChange} />
-                    <button id="custom-btn" onClick={this.handleCustomBtnClick}>Choose a file</button><br/>
-                    <button id="custom-btn" className="upload-btn" onClick={this.handleUploadBtnClick}>Send file</button>
+                    <div className='wrapper_buttons'>
+                        <div className="btn_container btn_fileUpload">
+                            <button className='btn' onClick={this.handleCustomBtnClick}>Choose a file</button><br />
+                        </div>
+                        <div className="btn_container btn_sendFile">
+                            <button className="btn" onClick={this.handleUploadBtnClick}>Send file</button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         );

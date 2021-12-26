@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import imgFile from '../assets/file.png';
 import nn from '../assets/nn.jpg';
-
+import predictionImg from '../assets/prediction.png'
+import predictive from '../assets/predictive-chart.png'
 
 class Navigation extends Component {
     constructor() {
@@ -19,7 +20,7 @@ class Navigation extends Component {
             this.setState({ tab_index: "1" })
         else if (window.localStorage.pathname === "/training")
             this.setState({ tab_index: "2" })
-        else if (window.localStorage.pathname === "/report")
+        else if (window.localStorage.pathname === "/prediction")
             this.setState({ tab_index: "3" })
         else
             window.location.href="/file-upload"
@@ -60,9 +61,9 @@ class Navigation extends Component {
                     </li>
 
                     <li className={this.state.tab_index === "3" ? "list active" : "list"} onClick={this.handleOnClick} name="3">
-                        <Link className="aLink" to="/report" name="3">
-                            <span className="icon" name="3"><img src={imgFile} alt="img" name="3" /></span>
-                            <span className="text" hidden={this.state.tab_index === "3"? false:true} name="3"> Report</span>
+                        <Link className="aLink" to="/prediction" name="3">
+                            <span className="icon" name="3"><img src={predictionImg} alt="img" name="3" /></span>
+                            <span className="text" hidden={this.state.tab_index === "3"? false:true} name="3"> Prediction</span>
                         </Link>
                     </li>
                     <div className="indicator"></div>
