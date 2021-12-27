@@ -1,7 +1,6 @@
 import './App.css';
 import FileUpload from './Components/FileUpload';
 import Navigation from './Components/Navigation';
-import Report from './Components/Report';
 import Prediction from './Components/Prediction';
 import Training from './Components/Training';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
