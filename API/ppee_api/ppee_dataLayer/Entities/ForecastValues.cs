@@ -8,19 +8,19 @@ using System.Threading.Tasks;
 
 namespace ppee_dataLayer.Entities
 {
-    public class Load
+    public class ForecastValues
     {
-        public Load()
+        public ForecastValues()
         {
 
         }
 
-        public string Date { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public int Id { get; set; }
 
-        public string FromTime { get; set; }
+        public string DateAndTime { get; set; }
+        public double Load { get; set; }
 
-        public string ToTime { get; set; }
-
-        public long MWh { get; set; }
     }
 }

@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\ForecastValues.cs" />
     <Compile Include="Entities\Load.cs" />
     <Compile Include="Entities\MinMaxValues.cs" />
     <Compile Include="Entities\Weather.cs" />
@@ -81,6 +82,10 @@
     <Compile Include="Migrations\202112261628007_table_for_min_max_values.cs" />
     <Compile Include="Migrations\202112261628007_table_for_min_max_values.designer.cs">
       <DependentUpon>202112261628007_table_for_min_max_values.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202112271451506_forecast_values_table.cs" />
+    <Compile Include="Migrations\202112271451506_forecast_values_table.designer.cs">
+      <DependentUpon>202112271451506_forecast_values_table.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PPEE_DataContext.cs" />
@@ -97,6 +102,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202112261628007_table_for_min_max_values.resx">
       <DependentUpon>202112261628007_table_for_min_max_values.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202112271451506_forecast_values_table.resx">
+      <DependentUpon>202112271451506_forecast_values_table.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

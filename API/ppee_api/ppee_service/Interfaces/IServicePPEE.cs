@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ppee_dataLayer.Entities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace ppee_service.Interfaces
 
         Task<bool> Training(string startDate, string endDate);
 
-        Task<Tuple<double, double>> Predict(string startDate, int numberOfDays);
+        Task<Tuple<string, double>> Predict(string startDate, int numberOfDays);
+
+        Task<bool> ExportToCSV(List<ForecastValues> data, bool dataRange = false);
     }
 }

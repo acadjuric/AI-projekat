@@ -31,10 +31,10 @@ namespace ppee_api.Controllers
         [HttpPost, Route("api/home/forecast")]
         public async Task<HttpResponseMessage> Forecast(Prediction model)
         {
-            Tuple<double, double> retVal = await service.Predict(model.StartDate, model.NumberOfDays);
+            Tuple<string, double> retVal = await service.Predict(model.StartDate, model.NumberOfDays);
 
             if (retVal != null)
-                return Request.CreateResponse<Tuple<double,double>>(HttpStatusCode.OK, retVal);
+                return Request.CreateResponse<Tuple<string, double>>(HttpStatusCode.OK, retVal);
 
             return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured");
         }

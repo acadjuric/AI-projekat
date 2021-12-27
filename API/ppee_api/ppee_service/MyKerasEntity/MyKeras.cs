@@ -65,10 +65,12 @@ namespace ppee_service.MyKerasEntity
             }
         }
 
-        private BaseModel LoadModel()
+        public BaseModel LoadModel()
         {
             if (!this.pathToBestModel.Equals(string.Empty))
             {
+                Keras.Backend.ClearSession();
+
                 var model = Sequential.ModelFromJson(File.ReadAllText(this.pathToBestModel + "model.json"));
                 model.LoadWeight(this.pathToBestModel + "model.h5");
 
@@ -81,7 +83,7 @@ namespace ppee_service.MyKerasEntity
         {
 
             var model = LoadModel();
-
+            
             if (model == null) return null;
 
             var result = model.Predict(predictorTest);

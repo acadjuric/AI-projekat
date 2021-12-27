@@ -21,6 +21,8 @@ namespace ppee_dataLayer
 
         public DbSet<WeatherAndLoad> WeatherAndLoads { get; set; }
         public DbSet<MinMaxValues> MinMaxValues { get; set; }
+        public DbSet<ForecastValues> ForecastValues { get; set; }
+
 
     }
 }

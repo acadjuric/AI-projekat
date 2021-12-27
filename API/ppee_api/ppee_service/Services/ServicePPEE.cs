@@ -1,4 +1,5 @@
 ﻿using ExcelDataReader;
+using Newtonsoft.Json;
 using Numpy;
 using ppee_dataLayer.Entities;
 using ppee_dataLayer.Interfaces;
@@ -11,6 +12,7 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -437,7 +439,7 @@ namespace ppee_service.Services
                 MinMaxValues minMaxValues = await dataSloj.LoadMinMaxValues();
 
                 //testiranje treninga za razne modele 
-                    //data = data.Take(3000).ToList();
+                //data = data.Take(3000).ToList();
                 //end testiranje
 
 
@@ -484,17 +486,17 @@ namespace ppee_service.Services
                 double absoluteError = KerasHelpers.GetAbsoluteDeviation(results, predictedTest);
 
                 //cuvanje treniranog modela -> model_mapeError.( json | h5)
-                myKeras.SaveModel(model, Math.Round(absoluteError,2).ToString() );
+                myKeras.SaveModel(model, Math.Round(absoluteError, 2).ToString());
 
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
         }
 
-        public async Task<Tuple<double, double>> Predict(string startDate, int numberOfDays)
+        public async Task<Tuple<string, double>> Predict(string startDate, int numberOfDays)
         {
 
             try
@@ -543,9 +545,64 @@ namespace ppee_service.Services
                 double squareError = KerasHelpers.GetSquareDeviation(results, predictedTest);
                 double absoluteError = KerasHelpers.GetAbsoluteDeviation(results, predictedTest);
 
-                Tuple<double, double> retVal = new Tuple<double, double>(squareError, absoluteError);
+                // Mapiranje podataka za export u csv, upis u bazu i vracanje klijentu
+                List<WeatherAndLoad> weahterWithRealDate = data.Skip(trainCount).ToList();
+                List<ForecastValues> dataForCsv = new List<ForecastValues>();
+
+                for (int i = 0; i < results.Count; i++)
+                {
+                    ForecastValues f = new ForecastValues()
+                    {
+                        DateAndTime = weahterWithRealDate[i].Date,
+                        Load = Math.Round(results[i], 2),
+                    };
+
+                    dataForCsv.Add(f);
+                }
+
+                await ExportToCSV(dataForCsv);
+
+                string jsonData = JsonConvert.SerializeObject(dataForCsv);
+                Tuple<string, double> retVal = new Tuple<string, double>(jsonData, absoluteError);
 
                 return retVal;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public Task<bool> ExportToCSV(List<ForecastValues> data, bool dateRange = false)
+        {
+            try
+            {
+                string path = AppDomain.CurrentDomain.BaseDirectory;
+                char[] charsToTrim = { '\\', ' ' };
+                path = path.TrimEnd(charsToTrim);
+                path = path.Substring(0, path.LastIndexOf('\\'));
+
+                if (dateRange)
+                    path += "\\DateRangeCSV\\";
+                else
+                {
+                    path += "\\EveryPredictionCSV\\";
+                    string date = DateTime.Now.ToString("dd/MM/yyyy hh:mm", CultureInfo.InvariantCulture);
+                    date = date.Replace('/', '-').Replace(':', '-').Replace(' ','_');
+
+                    path += "Prediction_" + date + ".csv";
+                }
+
+                var csv = new StringBuilder();
+
+                csv.AppendLine("Date and Time , MWh");
+
+                data.ForEach(item => csv.AppendLine($"{item.DateAndTime} , {item.Load}"));
+
+                File.WriteAllText(path, csv.ToString());
+
+                return Task.FromResult<bool>(true);
+
             }
             catch (Exception ex)
             {
