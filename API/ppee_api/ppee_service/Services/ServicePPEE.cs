@@ -610,5 +610,27 @@ namespace ppee_service.Services
                 throw ex;
             }
         }
+
+        public async Task<string> GetForecastValues(string startDate, string endDate)
+        {
+            try
+            {
+                DateTime start = DateTime.ParseExact(startDate, "d/M/yyyy", CultureInfo.InvariantCulture);
+                DateTime end = DateTime.ParseExact(endDate, "d/M/yyyy", CultureInfo.InvariantCulture);
+
+                end = end.AddHours(23); //kraj dana :)
+
+                IDatabase dataSloj = new DatabaseService();
+                List<ForecastValues> data = await dataSloj.LoadPredictedValues();
+
+                //izbaci iz data sve koji nisu u opsegu datuma i vrati data kao json
+
+                return JsonConvert.SerializeObject(data);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

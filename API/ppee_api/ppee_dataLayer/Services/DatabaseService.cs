@@ -44,15 +44,13 @@ namespace ppee_dataLayer.Services
             }
         }
 
-        public async Task<List<ForecastValues>> LoadPredictedValues(DateTime startDate, DateTime endDate)
+        public async Task<List<ForecastValues>> LoadPredictedValues()
         {
             try
             {
                 using (var db = new PPEE_DataContext())
                 {
-                    //izvuci one koji pripadaju opsegu datuma :)
-
-                    return await db.ForecastValues.Take(40).ToListAsync();
+                    return await db.ForecastValues.ToListAsync();
                 }
             }
             catch(Exception ex)

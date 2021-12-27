@@ -39,6 +39,17 @@ namespace ppee_api.Controllers
             return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured");
         }
 
+        [HttpPost, Route("api/home/report")]
+        public async Task<HttpResponseMessage> GetForcastValues(Training model)
+        {
+            //Training model korisim jer ocekujem iste atribute kao kod treninga ( od datuma - do datuma)
+            //var a = await service.GetForecastValues(model.FromDate, model.ToDate);
+
+            string jsonData = await service.GetForecastValues(model.FromDate, model.ToDate);
+            return Request.CreateResponse<string>(HttpStatusCode.OK, jsonData);
+
+        }
+
         [HttpPost, Route("api/home/fileupload")]
         public async Task<HttpResponseMessage> FileUpload()
         {

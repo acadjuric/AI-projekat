@@ -19,6 +19,6 @@ namespace ppee_dataLayer.Interfaces
 
         Task<bool> WritePredictedValues(List<ForecastValues> data);
 
-        Task<List<ForecastValues>> LoadPredictedValues(DateTime startDate, DateTime endDate);
+        Task<List<ForecastValues>> LoadPredictedValues();
     }
 }

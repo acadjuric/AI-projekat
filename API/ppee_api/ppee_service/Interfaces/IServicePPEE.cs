@@ -17,5 +17,8 @@ namespace ppee_service.Interfaces
         Task<Tuple<string, double>> Predict(string startDate, int numberOfDays);
 
         Task<bool> ExportToCSV(List<ForecastValues> data, bool dataRange = false);
+
+        Task<string> GetForecastValues(string startDate, string endDate);
+
     }
 }
