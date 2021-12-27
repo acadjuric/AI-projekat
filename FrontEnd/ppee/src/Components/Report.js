@@ -4,6 +4,17 @@ import axios from 'axios';
 
 const days = [1, 2, 3, 4, 5, 6, 7]
 
+const results = [
+    { id: 1, date: "15/12/2012", time: "13:00", MWh: 15000 },
+    { id: 2, date: "20/12/2012", time: "15:00", MWh: 16000 },
+    { id: 3, date: "25/12/2012", time: "17:00", MWh: 17000 },
+    { id: 4, date: "30/12/2012", time: "20:00", MWh: 18000 },
+    { id: 5, date: "15/12/2012", time: "13:00", MWh: 15000 },
+    { id: 6, date: "20/12/2012", time: "15:00", MWh: 16000 },
+    { id: 7, date: "25/12/2012", time: "17:00", MWh: 17000 },
+    { id: 8, date: "30/12/2012", time: "20:00", MWh: 18000 },    
+]
+
 class Report extends Component {
 
     constructor() {
@@ -16,9 +27,9 @@ class Report extends Component {
     }
 
 
-    handleSelectChange = event =>{
+    handleSelectChange = event => {
 
-        this.setState({[event.target.name] : event.target.value})
+        this.setState({ [event.target.name]: event.target.value })
     }
 
     onDateChange = event => {
@@ -35,7 +46,7 @@ class Report extends Component {
 
     handlePredict = () => {
         //backend model props start wiht uppercase character
-        var body ={
+        var body = {
             StartDate: this.state.fromDate,
             NumberOfDays: this.state.numberOfDays,
         }
@@ -72,9 +83,30 @@ class Report extends Component {
                 <div className="btn_container btn_predict">
                     <button className='btn' onClick={this.handlePredict}>Predict</button>
                 </div>
-                
+
+                <div className="policy-container">
+                    <div className="policy-table">
+                        <div className="headings">
+                            <span className="heading">Date</span>
+                            <span className="heading">Time</span>
+                            <span className="heading">MWh</span>
+                        </div>
+                        {
+                            results.map((item, index) => {
+                                return (
+                                    <div className="policy" key={item.id}>
+                                        <span>{item.date}</span>
+                                        <span>{item.time}</span>
+                                        <span>{item.MWh}</span>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                </div>
+
             </div>
-        
+
         );
     }
 }

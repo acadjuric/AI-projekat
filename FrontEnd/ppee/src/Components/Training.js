@@ -8,13 +8,14 @@ class Training extends Component {
         this.state = {
             fromDate: null,
             toDate: null,
+            messageFromServer: undefined
         }
     }
 
     handleTraining = () => {
-        
+
         //backend model props start wiht uppercase character
-        var body ={
+        var body = {
             FromDate: this.state.fromDate,
             ToDate: this.state.toDate,
         }
@@ -22,6 +23,7 @@ class Training extends Component {
         axios.post(baseUrl + "home/training", body).then(response => {
 
             console.log("Stiglo je od treninga-> ", response.data);
+            this.setState({messageFromServer : response.data})
 
         }).catch(error => {
             console.log(error);
@@ -46,13 +48,25 @@ class Training extends Component {
             <div className="training-container">
                 <h2 className='training_header'>Train model</h2>
                 <div className='training_content'>
-                    <span>From date <input id="fromDate" type="date" onChange={this.onDateChange} /> </span>
-                    <span>To date <input id="toDate" type="date" onChange={this.onDateChange} /> </span>
+                    <div className='training_span_and_date'>
+                        <span>From date</span>
+                        <input id="fromDate" type="date" onChange={this.onDateChange} />
+                    </div>
+                    <div className='training_span_and_date'>
+                        <span>To date</span><input id="toDate" type="date" onChange={this.onDateChange} />
+                    </div>
                 </div>
 
                 <div className="btn_container btn_train">
                     <button className='btn' onClick={this.handleTraining}>Training</button>
                 </div>
+
+                {
+                this.state.messageFromServer !== undefined ?
+                    (<div className='training_responseMessage'>
+                        <h3>{this.state.messageFromServer}</h3>
+                    </div>) : null
+                }
             </div>
         );
     }
