@@ -15,7 +15,7 @@ const days = [1, 2, 3, 4, 5, 6, 7]
 //     { id: 8, date: "30/12/2012", time: "20:00", MWh: 18000 },
 // ]
 
-class Report extends Component {
+class Prediction extends Component {
 
     constructor() {
         super();
@@ -28,7 +28,6 @@ class Report extends Component {
         }
 
     }
-
 
     handleSelectChange = event => {
 
@@ -125,4 +124,4 @@ class Report extends Component {
     }
 }
 
-export default Report;
+export default Prediction;
