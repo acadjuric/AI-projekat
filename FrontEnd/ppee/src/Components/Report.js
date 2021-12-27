@@ -4,16 +4,16 @@ import axios from 'axios';
 
 const days = [1, 2, 3, 4, 5, 6, 7]
 
-const results = [
-    { id: 1, date: "15/12/2012", time: "13:00", MWh: 15000 },
-    { id: 2, date: "20/12/2012", time: "15:00", MWh: 16000 },
-    { id: 3, date: "25/12/2012", time: "17:00", MWh: 17000 },
-    { id: 4, date: "30/12/2012", time: "20:00", MWh: 18000 },
-    { id: 5, date: "15/12/2012", time: "13:00", MWh: 15000 },
-    { id: 6, date: "20/12/2012", time: "15:00", MWh: 16000 },
-    { id: 7, date: "25/12/2012", time: "17:00", MWh: 17000 },
-    { id: 8, date: "30/12/2012", time: "20:00", MWh: 18000 },    
-]
+// const results = [
+//     { id: 1, date: "15/12/2012", time: "13:00", MWh: 15000 },
+//     { id: 2, date: "20/12/2012", time: "15:00", MWh: 16000 },
+//     { id: 3, date: "25/12/2012", time: "17:00", MWh: 17000 },
+//     { id: 4, date: "30/12/2012", time: "20:00", MWh: 18000 },
+//     { id: 5, date: "15/12/2012", time: "13:00", MWh: 15000 },
+//     { id: 6, date: "20/12/2012", time: "15:00", MWh: 16000 },
+//     { id: 7, date: "25/12/2012", time: "17:00", MWh: 17000 },
+//     { id: 8, date: "30/12/2012", time: "20:00", MWh: 18000 },
+// ]
 
 class Report extends Component {
 
@@ -21,7 +21,10 @@ class Report extends Component {
         super();
         this.state = {
             fromDate: null,
-            numberOfDays: '0'
+            numberOfDays: '0',
+            data: undefined,
+            mapeError: undefined,
+
         }
 
     }
@@ -55,7 +58,12 @@ class Report extends Component {
 
         axios.post(baseUrl + "home/forecast", body).then(response => {
 
-            console.log("Stiglo je od predicta-> ", response.data);
+            console.log("Stiglo je od predicta-> ", response.data );
+            
+            this.setState({ 
+                data: JSON.parse(response.data.m_Item1),
+                mapeError: response.data.m_Item2,
+            })
 
         }).catch(error => {
             console.log(error);
@@ -84,26 +92,32 @@ class Report extends Component {
                     <button className='btn' onClick={this.handlePredict}>Predict</button>
                 </div>
 
-                <div className="policy-container">
-                    <div className="policy-table">
-                        <div className="headings">
-                            <span className="heading">Date</span>
-                            <span className="heading">Time</span>
-                            <span className="heading">MWh</span>
+                {
+                    this.state.mapeError === undefined ? null: <h4> Apsolutna greska - {this.state.mapeError}</h4>
+                }
+
+                { this.state.data === undefined ? null :
+                    (<div className="policy-container">
+                        <div className="policy-table">
+                            <div className="headings">
+                                <span className="heading">Date</span>
+                                <span className="heading">Time</span>
+                                <span className="heading">MWh</span>
+                            </div>
+                            {
+                                this.state.data.map((item, index) => {
+                                    return (
+                                        <div className="policy" key={item.DateAndTime}>
+                                            <span>{item.DateAndTime.split(" ")[0]}</span>
+                                            <span>{item.DateAndTime.split(" ")[1]}</span>
+                                            <span>{item.Load}</span>
+                                        </div>
+                                    )
+                                })
+                            }
                         </div>
-                        {
-                            results.map((item, index) => {
-                                return (
-                                    <div className="policy" key={item.id}>
-                                        <span>{item.date}</span>
-                                        <span>{item.time}</span>
-                                        <span>{item.MWh}</span>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                </div>
+                    </div>)
+                }
 
             </div>
 
