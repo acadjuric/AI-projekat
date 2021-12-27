@@ -3,7 +3,9 @@ import FileUpload from './Components/FileUpload';
 import Navigation from './Components/Navigation';
 import Prediction from './Components/Prediction';
 import Training from './Components/Training';
+import Report from './Components/Report';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+
 
 function App() {
   return (
@@ -15,6 +17,7 @@ function App() {
           <Route path="/file-upload" element={<FileUpload />} />
           <Route path="/training" element={<Training />} />
           <Route path="/prediction" element={<Prediction />} />
+          <Route path="/report" element={<Report/>} />
         </Routes>
 
         

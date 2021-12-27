@@ -22,22 +22,24 @@ class Navigation extends Component {
             this.setState({ tab_index: "2" })
         else if (window.localStorage.pathname === "/prediction")
             this.setState({ tab_index: "3" })
+        else if (window.localStorage.pathname === "/report")
+            this.setState({ tab_index: "4" })
         else
-            window.location.href="/file-upload"
-            
-        
-            
+            window.location.href = "/file-upload"
+
+
+
     }
 
     handleOnClick = event => {
-        
-        if(event.target.name === undefined){
+
+        if (event.target.name === undefined) {
             var parent = event.target.parentElement
             console.log(parent)
             console.log(parent.name)
-            this.setState({tab_index: parent.name})
+            this.setState({ tab_index: parent.name })
         }
-        else 
+        else
             this.setState({ tab_index: event.target.name })
     }
 
@@ -63,9 +65,17 @@ class Navigation extends Component {
                     <li className={this.state.tab_index === "3" ? "list active" : "list"} onClick={this.handleOnClick} name="3">
                         <Link className="aLink" to="/prediction" name="3">
                             <span className="icon" name="3"><img src={predictionImg} alt="img" name="3" /></span>
-                            <span className="text" hidden={this.state.tab_index === "3"? false:true} name="3"> Prediction</span>
+                            <span className="text" hidden={this.state.tab_index === "3" ? false : true} name="3"> Prediction</span>
                         </Link>
                     </li>
+
+                    <li className={this.state.tab_index === "4" ? "list active" : "list"} onClick={this.handleOnClick} name="4">
+                        <Link className="aLink" to="/report" name="4">
+                            <span className="icon" name="4"><img src={predictive} alt="img" name="4" /></span>
+                            <span className="text" hidden={this.state.tab_index === "4" ? false : true} name="4"> Report</span>
+                        </Link>
+                    </li>
+
                     <div className="indicator"></div>
                 </ul>
             </div>

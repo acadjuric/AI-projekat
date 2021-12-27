@@ -139,16 +139,19 @@ transform: translateY(20px);
   background-color: #c83bff;
 }
 
-
 .navigation ul li:nth-child(2).active ~ .indicator {
   transform: translateX(calc(70px *1));
   
 }
 
-
 .navigation ul li:nth-child(3).active ~ .indicator {
   transform: translateX(calc(70px *2));
   background-color: #51caff;
+}
+
+.navigation ul li:nth-child(4).active ~ .indicator {
+  transform: translateX(calc(70px *3));
+  background-color: #FFCE00;
 }
 
 /* PAGE -> FILE UPLOAD */
@@ -652,9 +655,7 @@ select::-ms-expand {
   0 0 60px #c32aff; 
 }
 
-.btn_sendFile:hover .btn {
-  color: #fff;
-}
+
 
 .btn_predict::before,
 .btn_predict::after
@@ -664,6 +665,19 @@ select::-ms-expand {
   0 0 15px #2bd2ff,
   0 0 30px #2bd2ff,
   0 0 60px #2bd2ff;
+}
+
+.btn_report::before,
+.btn_report::after{
+  background: #FFCE00;
+  box-shadow: 0 0 5px #FFCE00,
+  0 0 15px #FFCE00,
+  0 0 30px #FFCE00,
+  0 0 60px #FFCE00;
+}
+
+.btn_report:hover .btn {
+  color: #fff;
 }
 
 .btn_random::before,
