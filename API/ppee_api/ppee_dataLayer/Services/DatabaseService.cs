@@ -15,13 +15,13 @@ namespace ppee_dataLayer.Services
         {
             try
             {
-                using(var db = new PPEE_DataContext())
+                using (var db = new PPEE_DataContext())
                 {
-                    
+
                     return await db.WeatherAndLoads.ToListAsync();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 string a = ex.Message;
                 return null;
@@ -32,11 +32,28 @@ namespace ppee_dataLayer.Services
         {
             try
             {
-                using(var db = new PPEE_DataContext())
+                using (var db = new PPEE_DataContext())
                 {
                     return await db.MinMaxValues.FirstAsync();
                 }
 
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<List<ForecastValues>> LoadPredictedValues(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                using (var db = new PPEE_DataContext())
+                {
+                    //izvuci one koji pripadaju opsegu datuma :)
+
+                    return await db.ForecastValues.Take(40).ToListAsync();
+                }
             }
             catch(Exception ex)
             {
@@ -48,9 +65,9 @@ namespace ppee_dataLayer.Services
         {
             try
             {
-                using(var db = new PPEE_DataContext())
+                using (var db = new PPEE_DataContext())
                 {
-                    if(db.MinMaxValues.ToList().Count > 0)
+                    if (db.MinMaxValues.ToList().Count > 0)
                         db.MinMaxValues.Remove(await db.MinMaxValues.FirstAsync());
 
                     db.MinMaxValues.Add(value);
@@ -60,7 +77,38 @@ namespace ppee_dataLayer.Services
                     return true;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> WritePredictedValues(List<ForecastValues> data)
+        {
+            try
+            {
+                using (var db = new PPEE_DataContext())
+                {
+                    var dataFromDataBase = await db.ForecastValues.ToListAsync();
+
+                    foreach (var item in data)
+                    {
+                        var oldItem = dataFromDataBase.Find(old => old.DateAndTime.Equals(item.DateAndTime));
+                        if (oldItem != null)
+                        {
+                            db.ForecastValues.Remove(oldItem);
+                        }
+
+                        db.ForecastValues.Add(item);
+                    }
+
+                    await db.SaveChangesAsync();
+
+                }
+
+                return true;
+            }
+            catch (Exception ex)
             {
                 throw ex;
             }

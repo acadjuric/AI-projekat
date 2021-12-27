@@ -560,6 +560,7 @@ namespace ppee_service.Services
                     dataForCsv.Add(f);
                 }
 
+                await dataSloj.WritePredictedValues(dataForCsv);
                 await ExportToCSV(dataForCsv);
 
                 string jsonData = JsonConvert.SerializeObject(dataForCsv);

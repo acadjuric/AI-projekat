@@ -16,5 +16,9 @@ namespace ppee_dataLayer.Interfaces
         Task<MinMaxValues> LoadMinMaxValues();
 
         Task<bool> UpdateMinMaxValues(MinMaxValues value);
+
+        Task<bool> WritePredictedValues(List<ForecastValues> data);
+
+        Task<List<ForecastValues>> LoadPredictedValues(DateTime startDate, DateTime endDate);
     }
 }
