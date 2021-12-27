@@ -115,12 +115,6 @@ namespace ppee_service.Services
 
                             w.TotalCloudCover = row["N"].ToString();
 
-                            //w.PresentWeather = row["WW"].ToString().Equals(string.Empty) ? prethodnaPresentWeather : row["WW"].ToString();
-                            //prethodnaPresentWeather = w.PresentWeather;
-                            //if (prethodnaPresentWeather.Equals(string.Empty))
-                            //    propertiesWithEmptyFields["WW"].Add(weathers.Count);
-                            //else if (propertiesWithEmptyFields["WW"].Count > 0)
-                            //    FixEmptyFields(propertiesWithEmptyFields, weathers, "WW");
 
                             w.Visibility = row["VV"].ToString().Equals(string.Empty) ? prethodnaVisibility : row["VV"].ToString();
                             prethodnaVisibility = w.Visibility;
@@ -262,8 +256,11 @@ namespace ppee_service.Services
                     string[] parts = item.Date.Split(' ');
                     string time = parts[1];
 
-                    string[] dateParts = parts[0].Split('.');
-                    string validDate = dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
+                    //string[] dateParts = parts[0].Split('.');
+                    //string validDate = dateParts[0] + "/" + dateParts[1] + "/" + dateParts[2];
+
+                    string validDate = parts[0].Replace('.', '/'); //samo datum
+
                     // TIME -> weather( 00:00) ; load (0:00)
                     //if (parts[1].First().Equals('0'))
                     //    parts[1] = parts[1].Substring(1);
@@ -276,7 +273,7 @@ namespace ppee_service.Services
 
                     WeatherAndLoad wl = new WeatherAndLoad()
                     {
-                        Date = item.Date,
+                        Date = item.Date.Replace('.', '/'), //ovde ide datum i vreme
                         DayOfWeek = (float)(DateTime.Parse(validDateFormat).DayOfWeek),
                         Hour = float.Parse(parts[1].Split(':')[0]),
                         Month = DateTime.Parse(validDateFormat).Month,
