@@ -431,8 +431,9 @@ namespace ppee_service.Services
         {
             try
             {
-                //DateTime start = DateTime.ParseExact(startDate, "d/M/yyyy", CultureInfo.InvariantCulture);
-                //DateTime end = DateTime.ParseExact(endDate, "d/M/yyyy", CultureInfo.InvariantCulture);
+                DateTime start = DateTime.ParseExact(startDate, "d/M/yyyy", CultureInfo.InvariantCulture);
+                DateTime end = DateTime.ParseExact(endDate, "d/M/yyyy", CultureInfo.InvariantCulture);
+                end = end.AddHours(23); //kraj dana :)
 
                 IDatabase dataSloj = new DatabaseService();
                 List<WeatherAndLoad> data = await dataSloj.LoadFromDataBase();
@@ -443,7 +444,12 @@ namespace ppee_service.Services
                 //end testiranje
 
 
-                //NEKAKO ISCUPATI IZ SVIH PODATAKA SAMO ONE KOJI SU U OPSEGU PROSLEDjENIH DATUMA
+                // UZETI PODATKE U DATUMSKOM OPSEGU
+
+                //data = await GetWeatherLoadDataInDateRange(data, start, end);
+
+                //END PODACI U DATUMSKOM OPSEGU
+
 
                 List<List<float>> predictorData = KerasHelpers.ScaleDataSetAndGetPredictorData(data, minMaxValues);
                 //moze ovako jer u metodi scale skaliram i MWh u opsegu 0-1
@@ -501,8 +507,8 @@ namespace ppee_service.Services
 
             try
             {
-                //DateTime start = DateTime.ParseExact(startDate, "d/M/yyyy", CultureInfo.InvariantCulture);
-                //DateTime end = start.AddDays(numberOfDays);
+                DateTime start = DateTime.ParseExact(startDate, "d/M/yyyy", CultureInfo.InvariantCulture);
+                DateTime end = start.AddDays(numberOfDays).AddHours(23);
 
 
 
@@ -510,7 +516,11 @@ namespace ppee_service.Services
                 List<WeatherAndLoad> data = await dataSloj.LoadFromDataBase();
                 MinMaxValues minMaxValues = await dataSloj.LoadMinMaxValues();
 
-                //NEKAKO ISCUPATI IZ SVIH PODATAKA SAMO ONE KOJI SU U OPSEGU PROSLEDjENIH DATUMA
+                // UZETI PODATKE U DATUMSKOM OPSEGU
+
+                //data = await GetWeatherLoadDataInDateRange(data, start, end);
+
+                //END PODACI U DATUMSKOM OPSEGU
 
                 List<List<float>> predictorData = KerasHelpers.ScaleDataSetAndGetPredictorData(data, minMaxValues);
                 //moze ovako jer u metodi scale skaliram i MWh u opsegu 0-1
@@ -628,7 +638,7 @@ namespace ppee_service.Services
                 IDatabase dataSloj = new DatabaseService();
                 List<ForecastValues> data = await dataSloj.LoadPredictedValues();
 
-                var retVal = FindDataInDateRange(data, start, end);
+                var retVal = await FindDataInDateRange(data, start, end);
 
                 if (exportToCSV)
                 {
@@ -649,7 +659,7 @@ namespace ppee_service.Services
             }
         }
 
-        private List<ForecastValues> FindDataInDateRange(List<ForecastValues> data, DateTime start, DateTime end)
+        private Task<List<ForecastValues>> FindDataInDateRange(List<ForecastValues> data, DateTime start, DateTime end)
         {
             List<ForecastValues> retVal = new List<ForecastValues>();
 
@@ -661,7 +671,22 @@ namespace ppee_service.Services
                     retVal.Add(item);
             }
 
-            return retVal;
+            return Task.FromResult<List<ForecastValues>>(retVal);
+        }
+
+        private Task<List<WeatherAndLoad>> GetWeatherLoadDataInDateRange(List<WeatherAndLoad> data, DateTime start, DateTime end)
+        {
+            List<WeatherAndLoad> retVal = new List<WeatherAndLoad>();
+
+            foreach (var item in data)
+            {
+                var temp = DateTime.ParseExact(item.Date, "d/M/yyyy HH:mm", CultureInfo.InvariantCulture);
+
+                if (temp >= start && temp <= end)
+                    retVal.Add(item);
+            }
+
+            return Task.FromResult<List<WeatherAndLoad>>(retVal);
         }
 
     }
