@@ -574,7 +574,7 @@ namespace ppee_service.Services
             }
         }
 
-        public Task<bool> ExportToCSV(List<ForecastValues> data, bool dateRange = false)
+        public Task<bool> ExportToCSV(List<ForecastValues> data, string dateRange = null)
         {
             try
             {
@@ -583,16 +583,21 @@ namespace ppee_service.Services
                 path = path.TrimEnd(charsToTrim);
                 path = path.Substring(0, path.LastIndexOf('\\'));
 
-                if (dateRange)
+                if (dateRange != null)
+                {
                     path += "\\DateRangeCSV\\";
+                    path += "Report_" + dateRange;
+                }
                 else
                 {
                     path += "\\EveryPredictionCSV\\";
                     string date = DateTime.Now.ToString("dd/MM/yyyy hh:mm", CultureInfo.InvariantCulture);
-                    date = date.Replace('/', '-').Replace(':', '-').Replace(' ','_');
+                    date = date.Replace('/', '-').Replace(':', '-').Replace(' ', '_');
 
-                    path += "Prediction_" + date + ".csv";
+                    path += "Prediction_" + date;
                 }
+
+                path += ".csv";
 
                 var csv = new StringBuilder();
 
@@ -611,7 +616,7 @@ namespace ppee_service.Services
             }
         }
 
-        public async Task<string> GetForecastValues(string startDate, string endDate)
+        public async Task<string> GetForecastValues(string startDate, string endDate, bool exportToCSV = false)
         {
             try
             {
@@ -623,15 +628,17 @@ namespace ppee_service.Services
                 IDatabase dataSloj = new DatabaseService();
                 List<ForecastValues> data = await dataSloj.LoadPredictedValues();
 
+                var retVal = FindDataInDateRange(data, start, end);
 
-                List<ForecastValues> retVal = new List<ForecastValues>();
-
-                foreach (var item in data)
+                if (exportToCSV)
                 {
-                    var temp = DateTime.ParseExact(item.DateAndTime, "d/M/yyyy HH:mm", CultureInfo.InvariantCulture);
+                    startDate = startDate.Replace('/', '-');
+                    endDate = endDate.Replace('/', '-');
+                    string dateRange = startDate + "_" + endDate;
 
-                    if (temp >= start && temp <= end)
-                        retVal.Add(item);
+                    await ExportToCSV(retVal, dateRange);
+
+                    return "Data Exported successfully";
                 }
 
                 return JsonConvert.SerializeObject(retVal);
@@ -641,5 +648,21 @@ namespace ppee_service.Services
                 throw ex;
             }
         }
+
+        private List<ForecastValues> FindDataInDateRange(List<ForecastValues> data, DateTime start, DateTime end)
+        {
+            List<ForecastValues> retVal = new List<ForecastValues>();
+
+            foreach (var item in data)
+            {
+                var temp = DateTime.ParseExact(item.DateAndTime, "d/M/yyyy HH:mm", CultureInfo.InvariantCulture);
+
+                if (temp >= start && temp <= end)
+                    retVal.Add(item);
+            }
+
+            return retVal;
+        }
+
     }
 }

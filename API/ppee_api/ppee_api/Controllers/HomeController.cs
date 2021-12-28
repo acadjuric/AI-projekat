@@ -50,6 +50,14 @@ namespace ppee_api.Controllers
 
         }
 
+        [HttpPost, Route("api/home/export")]
+        public async Task<HttpResponseMessage> ExportReportToCSV(Training model)
+        {
+            string response = await service.GetForecastValues(model.FromDate, model.ToDate, exportToCSV: true);
+
+            return Request.CreateResponse<string>(HttpStatusCode.OK, response);
+        }
+
         [HttpPost, Route("api/home/fileupload")]
         public async Task<HttpResponseMessage> FileUpload()
         {
