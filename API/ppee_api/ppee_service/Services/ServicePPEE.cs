@@ -623,9 +623,18 @@ namespace ppee_service.Services
                 IDatabase dataSloj = new DatabaseService();
                 List<ForecastValues> data = await dataSloj.LoadPredictedValues();
 
-                //izbaci iz data sve koji nisu u opsegu datuma i vrati data kao json
 
-                return JsonConvert.SerializeObject(data);
+                List<ForecastValues> retVal = new List<ForecastValues>();
+
+                foreach (var item in data)
+                {
+                    var temp = DateTime.ParseExact(item.DateAndTime, "d/M/yyyy HH:mm", CultureInfo.InvariantCulture);
+
+                    if (temp >= start && temp <= end)
+                        retVal.Add(item);
+                }
+
+                return JsonConvert.SerializeObject(retVal);
             }
             catch (Exception ex)
             {
