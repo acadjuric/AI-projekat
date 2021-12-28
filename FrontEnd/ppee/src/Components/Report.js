@@ -11,6 +11,8 @@ class Report extends Component {
             fromDate: null,
             toDate: null,
             data: undefined,
+            exportFromDate: null,
+            exportToDate: null,
         }
 
     }
@@ -39,7 +41,30 @@ class Report extends Component {
         axios.post(baseUrl + "home/report", body).then(response => {
 
             console.log("Stiglo je od report-a --> ", response.data);
-            this.setState({data : JSON.parse(response.data)})
+
+            this.setState({
+                data : JSON.parse(response.data),
+                exportFromDate: body.FromDate,
+                exportToDate: body.ToDate,
+            })
+
+        }).catch(error => {
+            console.log(error);
+        })
+    }
+
+    handleExport = () =>{
+
+        var body = {
+            FromDate: this.state.exportFromDate,
+            ToDate: this.state.exportToDate,
+        }
+
+        console.log(body);
+
+        axios.post(baseUrl + "home/export", body).then(response => {
+
+            console.log("Stiglo je od exporta-a --> ", response.data);
 
         }).catch(error => {
             console.log(error);
@@ -64,10 +89,16 @@ class Report extends Component {
                     <button className='btn' onClick={this.handleShowReport}>Show forecast</button>
                 </div>
 
-
+                {
+                    this.state.data === undefined ? null : (
+                        <div className='export_content'> 
+                            <button className='btnExport' onClick={this.handleExport}> Export to CSV </button>
+                        </div>
+                    )
+                }
                 { this.state.data === undefined ? null :
                     (<div className="policy-container">
-                        <div className="policy-table">
+                        <div className="policy-table-report">
                             <div className="headings">
                                 <span className="heading">Date</span>
                                 <span className="heading">Time</span>
