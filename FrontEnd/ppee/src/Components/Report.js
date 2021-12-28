@@ -39,6 +39,7 @@ class Report extends Component {
         axios.post(baseUrl + "home/report", body).then(response => {
 
             console.log("Stiglo je od report-a --> ", response.data);
+            this.setState({data : JSON.parse(response.data)})
 
         }).catch(error => {
             console.log(error);
