@@ -24,6 +24,8 @@ class Navigation extends Component {
             this.setState({ tab_index: "3" })
         else if (window.localStorage.pathname === "/report")
             this.setState({ tab_index: "4" })
+        else if (window.localStorage.pathname === "/optimization")
+            this.setState({ tab_index: "5" })
         else
             window.location.href = "/file-upload"
 
@@ -73,6 +75,13 @@ class Navigation extends Component {
                         <Link className="aLink" to="/report" name="4">
                             <span className="icon" name="4"><img src={predictive} alt="img" name="4" /></span>
                             <span className="text" hidden={this.state.tab_index === "4" ? false : true} name="4"> Report</span>
+                        </Link>
+                    </li>
+
+                    <li className={this.state.tab_index === "5" ? "list active" : "list"} onClick={this.handleOnClick} name="5">
+                        <Link className="aLink" to="/optimization" name="5">
+                            <span className="icon" name="5"><img src={predictive} alt="img" name="5" /></span>
+                            <span className="text" hidden={this.state.tab_index === "5" ? false : true} name="5"> Optimization</span>
                         </Link>
                     </li>
 

@@ -4,6 +4,8 @@ import Navigation from './Components/Navigation';
 import Prediction from './Components/Prediction';
 import Training from './Components/Training';
 import Report from './Components/Report';
+import Optimization from './Components/Optimization';
+
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 
@@ -18,6 +20,7 @@ function App() {
           <Route path="/training" element={<Training />} />
           <Route path="/prediction" element={<Prediction />} />
           <Route path="/report" element={<Report/>} />
+          <Route path="/optimization" element={<Optimization/>} />
         </Routes>
 
         

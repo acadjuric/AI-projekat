@@ -154,6 +154,11 @@ transform: translateY(20px);
   background-color: #FFCE00;
 }
 
+.navigation ul li:nth-child(5).active ~ .indicator {
+  transform: translateX(calc(70px *4));
+  background-color: #ff1f71;
+}
+
 /* PAGE -> FILE UPLOAD */
 .file-upload-body{
   /* margin-top: 130px; */
@@ -722,4 +727,112 @@ select::-ms-expand {
   0 0 15px #ff7a4d,
   0 0 30px #ff7a4d,
   0 0 60px #ff7a4d;
+}
+/*OPTIMIZATION*/
+
+/* CSS */
+.button-43 {
+  background-image: linear-gradient(-180deg, #37AEE2 0%, #1E96C8 100%);
+  border-radius: .5rem;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  display: flex;
+  font-size: 16px;
+  justify-content: center;
+  padding: 1rem 1.75rem;
+  text-decoration: none;
+  width: 100%;
+  border: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-43:hover {
+  background-image: linear-gradient(-180deg, #1D95C9 0%, #17759C 100%);
+}
+
+
+/* MODAL  */
+
+.modal, .modal-overlay{
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+}
+
+.modal-overlay{
+  background: rgba(49, 49, 49, 0.8);
+  backdrop-filter: blur(1px);
+  z-index: 3;
+}
+
+.modal-form{
+  height: 520px;
+  width: 400px;
+  background-color: rgba(255,255,255,0.13);
+  position: absolute;
+  transform: translate(-50%,-50%);
+  top: 50%;
+  left: 50%;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255,255,255,0.1);
+  box-shadow: 0 0 40px rgba(8,7,16,0.6);
+  padding: 50px 35px;
+  z-index: 4;
+}
+
+.modal-form *{
+  font-family: 'Poppins',sans-serif;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  outline: none;
+  border: none;
+}
+
+.modal-form .modal-header {
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 42px;
+  text-align: center;
+}
+
+.modal-label{
+  display: block;
+  margin-top: 30px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.modal-input, .modal-select{
+  display: block;
+  height: 50px;
+  width: 100%;
+  background-color: rgba(255,255,255,0.07);
+  border-radius: 3px;
+  padding: 0 10px;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 300;
+}
+
+.modal-input::placeholder{
+  color: #e5e5e5;
+}
+
+.modal-submit{
+  margin-top: 30px;
+  width: 100%;
+  background-color: #ffffff;
+  color: #080710;
+  padding: 15px 0;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
 }

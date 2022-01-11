@@ -23,7 +23,7 @@ class Training extends Component {
         axios.post(baseUrl + "home/training", body).then(response => {
 
             console.log("Stiglo je od treninga-> ", response.data);
-            this.setState({messageFromServer : response.data})
+            this.setState({ messageFromServer: response.data })
 
         }).catch(error => {
             console.log(error);
@@ -62,10 +62,10 @@ class Training extends Component {
                 </div>
 
                 {
-                this.state.messageFromServer !== undefined ?
-                    (<div className='training_responseMessage'>
-                        <h3>{this.state.messageFromServer}</h3>
-                    </div>) : null
+                    this.state.messageFromServer !== undefined ?
+                        (<div className='training_responseMessage'>
+                            <h3>{this.state.messageFromServer}</h3>
+                        </div>) : null
                 }
             </div>
         );
