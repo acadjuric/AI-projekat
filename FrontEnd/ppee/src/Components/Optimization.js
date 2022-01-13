@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Modal from './Modal';
-import delteTrash from '../assets/delete.png'
+import delteTrash from '../assets/delete1.png'
+import saveIcon from '../assets/save-icon.png'
 
 const generators = [
     { maxValue: 30, minValue: 10, numberForOptimization: 2, type: "coal" },
@@ -8,6 +9,7 @@ const generators = [
     { maxValue: 50, minValue: 33, numberForOptimization: 2, type: "solar" },
     { maxValue: 47, minValue: 26, numberForOptimization: 2, type: "gas" },
     { maxValue: 56, minValue: 8, numberForOptimization: 2, type: "hydro" },
+    
 ]
 
 class Optimization extends Component {
@@ -31,6 +33,14 @@ class Optimization extends Component {
         console.log(generators[index]);
     }
 
+    SaveNumberOfGenerators = (index) => {
+
+        if (this.state.myGenerators[index] === undefined)
+            return;
+
+        console.log(this.state.myGenerators[index]);
+    }
+
     handleInputChange = (index, event) => {
         if (generators[index] === undefined)
             return;
@@ -38,14 +48,14 @@ class Optimization extends Component {
         console.log(generators[index]);
         generators[index].numberForOptimization = event.target.value;
         console.log(generators[index]);
-        this.setState({myGenerators:generators})
+        this.setState({ myGenerators: generators })
     }
 
     render() {
         return (
-            <div>
+            <div className='optimization-container'>
 
-                <button className='button-43' onClick={this.toggleModal}>Add generator</button><br />
+                <button className='button-43' onClick={this.toggleModal}>Add generator</button>
                 {
                     this.state.showModal && (<Modal toggleModal={this.toggleModal} />)
                 }
@@ -63,10 +73,14 @@ class Optimization extends Component {
                                         <h3>Min value</h3>
                                         <p>{item.minValue}</p>
                                         <h3>Optimization number</h3>
-                                        <input value={item.numberForOptimization} onChange={(event) => this.handleInputChange(index,event)} />
+                                        <input value={item.numberForOptimization} onChange={(event) => this.handleInputChange(index, event)} />
 
-                                        <div className='card-deleteBtn'>
-                                            <button onClick={() => this.deleteGenerator(index)}><img src={delteTrash} alt='delete' /></button>
+                                        <div className='card-BtnContainer'>
+
+                                            <button className='BtnContainer-save' onClick={() => this.SaveNumberOfGenerators(index)}><img src={saveIcon} alt='save' /></button>
+
+                                            <button className='BtnContainer-delete' onClick={() => this.deleteGenerator(index)}><img src={delteTrash} alt='delete' /></button>
+
                                         </div>
                                     </div>
                                     <div className={"card-stats card-stats-" + item.type}>

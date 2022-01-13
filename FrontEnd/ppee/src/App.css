@@ -728,9 +728,18 @@ select::-ms-expand {
   0 0 30px #ff7a4d,
   0 0 60px #ff7a4d;
 }
-/*OPTIMIZATION*/
 
-/* CSS */
+
+/* OPTIMIZATION PAGE*/
+
+.optimization-container{
+  position: absolute;
+  top: 140px;
+  width: 100%;
+  min-height: 100vh;
+  text-align: center;
+}
+
 .button-43 {
   background-image: linear-gradient(-180deg, #37AEE2 0%, #1E96C8 100%);
   border-radius: .5rem;
@@ -741,7 +750,8 @@ select::-ms-expand {
   justify-content: center;
   padding: 1rem 1.75rem;
   text-decoration: none;
-  width: 100%;
+  margin: auto;
+  width: 180px;
   border: 0;
   cursor: pointer;
   user-select: none;
@@ -758,7 +768,7 @@ select::-ms-expand {
 
 .modal, .modal-overlay{
   width: 100%;
-  top: 0;
+  top: -140px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -775,10 +785,11 @@ select::-ms-expand {
   height: 520px;
   width: 400px;
   background-color: rgba(255,255,255,0.13);
-  position: absolute;
+  /* position: absolute; 
   transform: translate(-50%,-50%);
   top: 50%;
-  left: 50%;
+  left: 50%; */
+  margin: 10% auto; /* ovo zakomentarisi, a ovo iznad upotrebi kako bi modal stalno bio prikazan na pola ekrana*/
   border-radius: 10px;
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255,255,255,0.1);
@@ -935,19 +946,19 @@ select::-ms-expand {
 }
 
 .card-stats-coal {
-  background: rgb(255, 7, 110);
+  background: #4a154b
 }
 .card-stats-hydro {
-  background: #1877f2
+  background: #36c5f0
 }
 .card-stats-gas {
-  background: #ff7a4d
+  background: #e01e5a
 }
 .card-stats-wind{
-  background: #37AEE2
+  background: #23b67d
 }
 .card-stats-solar{
-  background: green
+  background: #ecb22e
 }
 
 .card-stats .stat {
@@ -967,24 +978,33 @@ select::-ms-expand {
   letter-spacing: 1px;
 }
 
-.card-deleteBtn{
-  /* background-color: blue; */
+.card-BtnContainer{
   margin-top: 10px;
   width: 100%;
+  display:inline-flex;
+  justify-content:space-evenly;
 }
 
-.card-deleteBtn button{
-  background-color: red;
-  width: 50px;
-  height: 40px;
+.card-BtnContainer button{
+  width: 40px;
+  height: 35px;
   background-size: cover;
   border: none;
   outline: none;
   border-radius: 5px;
 }
 
-.card-deleteBtn button:hover{
+.card-BtnContainer button:hover{
   cursor: pointer;
+  transform: scale(1.05);
 }
 
+.BtnContainer-delete{
+background-color: red;
+}
+
+.BtnContainer-save{
+  background-color: rgba(255, 255, 255, 0.1);
+  
+}
 
