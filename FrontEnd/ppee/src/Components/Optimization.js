@@ -9,7 +9,7 @@ const generators = [
     { maxValue: 50, minValue: 33, numberForOptimization: 2, type: "solar" },
     { maxValue: 47, minValue: 26, numberForOptimization: 2, type: "gas" },
     { maxValue: 56, minValue: 8, numberForOptimization: 2, type: "hydro" },
-    
+
 ]
 
 class Optimization extends Component {
@@ -18,12 +18,17 @@ class Optimization extends Component {
         this.state = {
             showModal: false,
             myGenerators: generators,
+            showSettings: false,
         }
     }
 
     toggleModal = () => {
 
-        this.setState({ showModal: !this.state.showModal })
+        this.setState({ showModal: !this.state.showModal });
+    }
+
+    toggleSettings = () => {
+        this.setState({ showSettings: !this.state.showSettings });
     }
 
     deleteGenerator = (index) => {
@@ -55,46 +60,62 @@ class Optimization extends Component {
         return (
             <div className='optimization-container'>
 
-                <button className='button-43' onClick={this.toggleModal}>Add generator</button>
+                <div className='optimization-options'>
+                    <button className='button-43' onClick={this.toggleModal}>Add generator</button>
+                    <button className='btn-showHide-settings' onClick={this.toggleSettings}>{this.state.showSettings === true ? "Hide Settings" : "Show Settings"}</button>
+
+                </div>
+
                 {
                     this.state.showModal && (<Modal toggleModal={this.toggleModal} />)
                 }
+                {
+                    this.state.showSettings &&
 
-                <div className='card-container'>
-                    {
-                        this.state.myGenerators && this.state.myGenerators.map((item, index) => {
-                            return (
-                                <div className="card" key={index}>
-                                    <div className={"card-image card-image-" + item.type}></div>
-                                    <div className="card-text">
-                                        <h3>Max value</h3>
-                                        <p>{item.maxValue}</p>
+                    <div className='settings-container'>
 
-                                        <h3>Min value</h3>
-                                        <p>{item.minValue}</p>
-                                        <h3>Optimization number</h3>
-                                        <input value={item.numberForOptimization} onChange={(event) => this.handleInputChange(index, event)} />
+                        <div className='basic-settings'>
+                            <button className='button-43' onClick={this.toggleModal}>Add generator</button>
+                            <h1> ovde ide izbor kirterijumske funkcije i podesavanje cene goriva kao i emisije CO2 </h1>
+                        </div>
 
-                                        <div className='card-BtnContainer'>
+                        <div className='card-container'>
+                            {
+                                this.state.myGenerators && this.state.myGenerators.map((item, index) => {
+                                    return (
+                                        <div className="card" key={index}>
+                                            <div className={"card-image card-image-" + item.type}></div>
+                                            <div className="card-text">
+                                                <h3>Max value</h3>
+                                                <p>{item.maxValue}</p>
 
-                                            <button className='BtnContainer-save' onClick={() => this.SaveNumberOfGenerators(index)}><img src={saveIcon} alt='save' /></button>
+                                                <h3>Min value</h3>
+                                                <p>{item.minValue}</p>
+                                                <h3>Optimization number</h3>
+                                                <input value={item.numberForOptimization} onChange={(event) => this.handleInputChange(index, event)} />
 
-                                            <button className='BtnContainer-delete' onClick={() => this.deleteGenerator(index)}><img src={delteTrash} alt='delete' /></button>
+                                                <div className='card-BtnContainer'>
 
+                                                    <button className='BtnContainer-save' onClick={() => this.SaveNumberOfGenerators(index)}><img src={saveIcon} alt='save' /></button>
+
+                                                    <button className='BtnContainer-delete' onClick={() => this.deleteGenerator(index)}><img src={delteTrash} alt='delete' /></button>
+
+                                                </div>
+                                            </div>
+                                            <div className={"card-stats card-stats-" + item.type}>
+                                                <div className="stat">
+                                                    <div className="type">{item.type}</div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className={"card-stats card-stats-" + item.type}>
-                                        <div className="stat">
-                                            <div className="type">{item.type}</div>
-                                        </div>
-                                    </div>
-                                </div>
 
-                            )
-                        })
-                    }
+                                    )
+                                })
+                            }
 
-                </div>
+                        </div>
+                    </div>
+                }
             </div>
         );
     }

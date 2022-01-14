@@ -740,6 +740,37 @@ select::-ms-expand {
   text-align: center;
 }
 
+.optimization-options{
+  padding: 5px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.btn-showHide-settings{
+  background-color: #42b72a;
+  border-radius: .5rem;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  display: flex;
+  font-size: 16px;
+  justify-content: center;
+  padding: 1rem 1.75rem;
+  text-decoration: none;
+  margin: auto;
+  width: 200px;
+  border: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none; 
+  letter-spacing: 1px;
+  margin: 10px;
+}
+
+.btn-showHide-settings:hover{
+  background-color: #00a400 ;
+}
 .button-43 {
   background-image: linear-gradient(-180deg, #37AEE2 0%, #1E96C8 100%);
   border-radius: .5rem;
@@ -757,6 +788,8 @@ select::-ms-expand {
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
+  letter-spacing: 1px;
+  margin:10px;
 }
 
 .button-43:hover {
@@ -849,7 +882,18 @@ select::-ms-expand {
 }
 
 /*KARTICE GENERATORA*/
+.settings-container{
+  background-color: lime;
+  display: block;
+}
+
+.basic-settings{
+  background-color: rebeccapurple;
+  margin-top: 10px;
+}
+
 .card-container{
+  background-color: red;
   display: flex;
   flex-wrap: wrap;
 }
