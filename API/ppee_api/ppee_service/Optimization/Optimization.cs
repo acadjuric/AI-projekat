@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CenterSpace.NMath.Core;
+using Newtonsoft.Json;
 using ppee_dataLayer.Entities;
 using ppee_dataLayer.Interfaces;
 using ppee_dataLayer.Services;
@@ -39,7 +40,7 @@ namespace ppee_service.Optimization
             return elektrane;
         }
 
-        
+
 
         public async void CreateOptimization()
         {
@@ -84,7 +85,7 @@ namespace ppee_service.Optimization
 
         }
 
-        
+
 
         private double OptimizationPerHour(ForecastValues forecast, List<PowerPlant> powerPlants, double windSpeed, double clouds, double sunAngle)
         {
@@ -128,7 +129,7 @@ namespace ppee_service.Optimization
                     else
                     {
                         int tempPower = (int)WindFunction(windSpeed, powerPlant.MaximumOutputPower);
-                        tempPower = (int)(tempPower* powerPlant.NumberOfWindGenerators) / 1000;
+                        tempPower = (int)(tempPower * powerPlant.NumberOfWindGenerators) / 1000;
                         renewableSources += tempPower;
                         windPower += tempPower;
                     }
@@ -142,6 +143,77 @@ namespace ppee_service.Optimization
             return renewableSources;
         }
 
+        private double OptmizationForNotRenewable(string typeOfOptimization, List<PowerPlant> powerPlants, double load)
+        {
+            // Z = MAX( -1X - 2Y)
+            DoubleVector costFunction = new DoubleVector();
+            
+            //SVAKI GENERATOR JE POSEBAN ZA SEBE
+            // X + Y + Z + U + V + M + N = SAMO ONO STO NEOBNOVLJIVI TREBA DA PROIZVODE [LOAD]
+            DoubleVector allPowerPlants = new DoubleVector();
+            
+            foreach (PowerPlant powerPlant in powerPlants)
+            {
+                if (typeOfOptimization.ToLower().Equals("cost"))
+                {
+                    if (powerPlant.Type.ToLower().Equals("coal"))
+                    {
+                        costFunction.Append(-1);
+                    }
+                    else if (powerPlant.Type.ToLower().Equals("gas"))
+                    {
+                        costFunction.Append(-2);
+                    }
+                }
+                else if (typeOfOptimization.ToLower().Equals("co2"))
+                {
+                    if (powerPlant.Type.ToLower().Equals("coal"))
+                    {
+                        costFunction.Append(-100);
+                    }
+                    else if (powerPlant.Type.ToLower().Equals("gas"))
+                    {
+                        costFunction.Append(-50);
+                    }
+                }
+
+                allPowerPlants.Append(1);
+
+            }
+
+            LinearProgrammingProblem linearProgrammingProblem = new LinearProgrammingProblem(costFunction);
+
+            linearProgrammingProblem.AddEqualityConstraint(allPowerPlants, load);
+
+            for(int i=0; i< powerPlants.Count; i++)
+            {
+                DoubleVector maxAndMinOutputForPowerPlant = new DoubleVector();
+
+                for(int j=0; j< powerPlants.Count; j++)
+                {
+                    if (i == j)
+                        maxAndMinOutputForPowerPlant.Append(1);
+                    else
+                        maxAndMinOutputForPowerPlant.Append(0);
+                }
+
+                linearProgrammingProblem.AddLowerBoundConstraint(maxAndMinOutputForPowerPlant, powerPlants[i].MinimumOutputPower);
+                linearProgrammingProblem.AddUpperBoundConstraint(maxAndMinOutputForPowerPlant, powerPlants[i].MaximumOutputPower);
+            }
+
+            PrimalSimplexSolver simplex = new PrimalSimplexSolver();
+            simplex.Solve(linearProgrammingProblem);
+
+            DoubleVector optimalSolution = simplex.OptimalX;
+
+            double notRenewable = 0;
+            for(int i=0; i< powerPlants.Count; i++)
+            {
+                notRenewable += optimalSolution[i];
+            }
+
+            return notRenewable;
+        }
 
         private double WindFunction(double mojaXvrednost, double PmaxWind)
         {
