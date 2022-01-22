@@ -44,6 +44,18 @@ namespace ppee_service.Optimization
 
         public async void CreateOptimization()
         {
+            OptimizationSettings optimizationSettings = new OptimizationSettings()
+            {
+                Date = "07/01/2019",
+                OptimizationType = "cost",
+                CostCoal = 35,
+                CostGas = 50,
+                CO2Coal = 100,
+                CO2Gas = 60,
+                WeightFactor = 1,
+                PowerPlantsForOptimization = InitElektrane(),
+            };
+
             var powerPlants = InitElektrane();
 
             string date = "07/01/2019";
@@ -75,11 +87,26 @@ namespace ppee_service.Optimization
             List<double> sunAnglesForHours = GetSunAngleInRadiansForHours(jsonResult);
             List<CloudsAndWindSpeed> cloudsAndWindSpeeds = GetCloudsAndWindSpeedFromJson(jsonResult);
 
-            double dayResult = 0;
+
             for (int i = 0; i < predictionHours.Count; i++)
             {
                 //za svaki sat pozivamo optimizaciju
-                dayResult += OptimizationPerHour(predictionHours[i], powerPlants, cloudsAndWindSpeeds[i].WindSpeed, cloudsAndWindSpeeds[i].WindSpeed, sunAnglesForHours[i]);
+                OptimizationPerHour optimizationPerHour = new OptimizationPerHour();
+
+                optimizationPerHour.DateTimeOfOptimization = DateTime.Parse(predictionHours[i].DateAndTime);
+                optimizationPerHour.Load = (int)predictionHours[i].Load;
+
+                List<OptimizedData> optimizedData = OptimizationPerHour(predictionHours[i], optimizationSettings, cloudsAndWindSpeeds[i].WindSpeed, cloudsAndWindSpeeds[i].WindSpeed, sunAnglesForHours[i]);
+
+                //optimizationPerHour.LoadsFromPowerPlants = optimizedData;
+
+                foreach (OptimizedData od in optimizedData)
+                {
+                    od.OptimizationPerHour = optimizationPerHour;
+                    optimizationPerHour.LoadsFromPowerPlants.Add(od);
+                }
+
+                //upis u bazu
             }
 
 
@@ -87,21 +114,35 @@ namespace ppee_service.Optimization
 
 
 
-        private double OptimizationPerHour(ForecastValues forecast, List<PowerPlant> powerPlants, double windSpeed, double clouds, double sunAngle)
+        private List<OptimizedData> OptimizationPerHour(ForecastValues forecast, OptimizationSettings optimizationSettings, double windSpeed, double clouds, double sunAngle)
         {
+            List<OptimizedData> optimizedData = new List<OptimizedData>();
+
             int sunPower = 0;
             int windPower = 0;
             int hydroPower = 0;
 
             int renewableSources = 0;
-            int minimumOutputPowerFromNotRenewableSources = 0;
+            int minimumOutputPowerFromNonRenewableSources = 0;
 
-            foreach (PowerPlant powerPlant in powerPlants)
+            foreach (PowerPlant powerPlant in optimizationSettings.PowerPlantsForOptimization)
             {
                 if (powerPlant.Type.ToLower().Equals("hydro"))
                 {
                     hydroPower += powerPlant.MaximumOutputPower;
                     renewableSources += powerPlant.MaximumOutputPower;
+
+                    OptimizedData od = new OptimizedData()
+                    {
+                        Name = powerPlant.Name + "-" + powerPlant.Id.ToString(),
+                        Load = powerPlant.MaximumOutputPower,
+                        Type = powerPlant.Type,
+                        CO2 = 0,
+                        Cost = (int)(powerPlant.MaximumOutputPower * 0.4),
+                    };
+
+                    optimizedData.Add(od);
+
                 }
                 else if (powerPlant.Type.ToLower().Equals("solar"))
                 {
@@ -111,69 +152,142 @@ namespace ppee_service.Optimization
                     int tempPower = (int)((0.1 + 0.9 * clouds) * (sunAngle) * powerPlant.MaximumOutputPower) / 1000000; //Megawatt
                     renewableSources += tempPower;
                     sunPower += tempPower;
+
+                    OptimizedData od = new OptimizedData()
+                    {
+                        Name = powerPlant.Name + "-" + powerPlant.Id.ToString(),
+                        Load = tempPower,
+                        Type = powerPlant.Type,
+                        CO2 = 0,
+                        Cost = 0,
+                    };
+
+                    optimizedData.Add(od);
                 }
                 else if (powerPlant.Type.ToLower().Equals("wind"))
                 {
+                    int tempPower = 0;
                     if (windSpeed < 2 || windSpeed > 25)
                     {
-                        int tempPower = 0;
+                        tempPower = 0;
                         renewableSources += tempPower;
                         windPower += tempPower;
                     }
                     else if (windSpeed >= 12 || windSpeed <= 25)
                     {
-                        int tempPower = (int)(powerPlant.MaximumOutputPower * powerPlant.NumberOfWindGenerators) / 1000;
+                        tempPower = (int)(powerPlant.MaximumOutputPower * powerPlant.NumberOfWindGenerators) / 1000;
                         renewableSources += tempPower;
                         windPower += tempPower;
                     }
                     else
                     {
-                        int tempPower = (int)WindFunction(windSpeed, powerPlant.MaximumOutputPower);
+                        tempPower = (int)WindFunction(windSpeed, powerPlant.MaximumOutputPower);
                         tempPower = (int)(tempPower * powerPlant.NumberOfWindGenerators) / 1000;
                         renewableSources += tempPower;
                         windPower += tempPower;
                     }
+
+                    OptimizedData od = new OptimizedData()
+                    {
+                        Name = powerPlant.Name + "-" + powerPlant.Id.ToString(),
+                        Load = tempPower,
+                        Type = powerPlant.Type,
+                        CO2 = 0,
+                        Cost = 0,
+                    };
+
+                    optimizedData.Add(od);
                 }
                 else
                 {
-                    minimumOutputPowerFromNotRenewableSources += powerPlant.MinimumOutputPower;
+                    minimumOutputPowerFromNonRenewableSources += powerPlant.MinimumOutputPower;
                 }
             }
 
-            return renewableSources;
+            int coefficient = 1;
+            if (renewableSources > forecast.Load - minimumOutputPowerFromNonRenewableSources)
+            {
+                coefficient = (int)((forecast.Load - minimumOutputPowerFromNonRenewableSources) / renewableSources);
+            }
+            foreach (OptimizedData od in optimizedData)
+            {
+                od.Load *= coefficient;
+            }
+            renewableSources = (int)optimizedData.Sum(x => x.Load);
+
+            int LoadForNonRenewablePowerPlants = (int)(forecast.Load - renewableSources);
+            List<PowerPlant> nonRenewablePowerPlants = optimizationSettings.PowerPlantsForOptimization.Where(x => x.Type.ToLower().Equals("gas") || x.Type.ToLower().Equals("coal")).ToList();
+
+            if (optimizationSettings.OptimizationType.ToLower().Equals("both"))
+            {
+                optimizationSettings.OptimizationType = "cost";
+                List<OptimizedData> nonRenewableOptimizedDataCost = OptimizationForNonRenewable(optimizationSettings, nonRenewablePowerPlants, LoadForNonRenewablePowerPlants);
+
+                optimizationSettings.OptimizationType = "co2";
+                List<OptimizedData> nonRenewableOptimizedDataCO2 = OptimizationForNonRenewable(optimizationSettings, nonRenewablePowerPlants, LoadForNonRenewablePowerPlants);
+
+                double weightFactorCO2 = 1 - optimizationSettings.WeightFactor;
+
+                for (int i = 0; i < nonRenewablePowerPlants.Count; i++)
+                {
+                    //isti broj elementa imaju pa moze u jednom for-u
+                    nonRenewableOptimizedDataCost[i].Load *= optimizationSettings.WeightFactor;
+                    nonRenewableOptimizedDataCO2[i].Load *= weightFactorCO2;
+
+                    nonRenewableOptimizedDataCost[i].Load += nonRenewableOptimizedDataCO2[i].Load;
+
+                    Tuple<int, int> costAndCO2emission = CalculateFuleCostAndCO2Emission(optimizationSettings, nonRenewablePowerPlants[i], nonRenewableOptimizedDataCost[i].Load);
+                    nonRenewableOptimizedDataCost[i].Cost = costAndCO2emission.Item1;
+                    nonRenewableOptimizedDataCost[i].CO2 = costAndCO2emission.Item2;
+                }
+
+                optimizedData.AddRange(nonRenewableOptimizedDataCost);
+
+            }
+            else
+            {
+                List<OptimizedData> nonRenewableOptimizedData = OptimizationForNonRenewable(optimizationSettings, nonRenewablePowerPlants, LoadForNonRenewablePowerPlants);
+
+                optimizedData.AddRange(nonRenewableOptimizedData);
+            }
+
+
+
+
+            return optimizedData;
         }
 
-        private double OptmizationForNotRenewable(string typeOfOptimization, List<PowerPlant> powerPlants, double load)
+        private List<OptimizedData> OptimizationForNonRenewable(OptimizationSettings optimizationSettings, List<PowerPlant> powerPlants, double load)
         {
             // Z = MAX( -1X - 2Y)
             DoubleVector costFunction = new DoubleVector();
-            
+
             //SVAKI GENERATOR JE POSEBAN ZA SEBE
             // X + Y + Z + U + V + M + N = SAMO ONO STO NEOBNOVLJIVI TREBA DA PROIZVODE [LOAD]
             DoubleVector allPowerPlants = new DoubleVector();
-            
+
             foreach (PowerPlant powerPlant in powerPlants)
             {
-                if (typeOfOptimization.ToLower().Equals("cost"))
+                if (optimizationSettings.OptimizationType.ToLower().Equals("cost"))
                 {
                     if (powerPlant.Type.ToLower().Equals("coal"))
                     {
-                        costFunction.Append(-1);
+                        costFunction.Append(-optimizationSettings.CostCoal);
                     }
                     else if (powerPlant.Type.ToLower().Equals("gas"))
                     {
-                        costFunction.Append(-2);
+                        costFunction.Append(-optimizationSettings.CostGas);
                     }
                 }
-                else if (typeOfOptimization.ToLower().Equals("co2"))
+                else if (optimizationSettings.OptimizationType.ToLower().Equals("co2"))
                 {
                     if (powerPlant.Type.ToLower().Equals("coal"))
                     {
-                        costFunction.Append(-100);
+                        costFunction.Append(-optimizationSettings.CO2Coal);
                     }
                     else if (powerPlant.Type.ToLower().Equals("gas"))
                     {
-                        costFunction.Append(-50);
+                        costFunction.Append(-optimizationSettings.CO2Gas);
                     }
                 }
 
@@ -185,11 +299,11 @@ namespace ppee_service.Optimization
 
             linearProgrammingProblem.AddEqualityConstraint(allPowerPlants, load);
 
-            for(int i=0; i< powerPlants.Count; i++)
+            for (int i = 0; i < powerPlants.Count; i++)
             {
                 DoubleVector maxAndMinOutputForPowerPlant = new DoubleVector();
 
-                for(int j=0; j< powerPlants.Count; j++)
+                for (int j = 0; j < powerPlants.Count; j++)
                 {
                     if (i == j)
                         maxAndMinOutputForPowerPlant.Append(1);
@@ -206,13 +320,56 @@ namespace ppee_service.Optimization
 
             DoubleVector optimalSolution = simplex.OptimalX;
 
-            double notRenewable = 0;
-            for(int i=0; i< powerPlants.Count; i++)
+            List<OptimizedData> nonRenewableOptimizedData = new List<OptimizedData>();
+
+            for (int i = 0; i < powerPlants.Count; i++)
             {
-                notRenewable += optimalSolution[i];
+                OptimizedData od = new OptimizedData()
+                {
+                    Name = powerPlants[i].Name + "-" + powerPlants[i].Id.ToString(),
+                    Load = optimalSolution[i],
+                    Type = powerPlants[i].Type,
+                    CO2 = 0,
+                    Cost = 0,
+                };
+
+
+                Tuple<int, int> costAndCO2emission = CalculateFuleCostAndCO2Emission(optimizationSettings, powerPlants[i], od.Load);
+                od.Cost = costAndCO2emission.Item1;
+                od.CO2 = costAndCO2emission.Item2;
+
+
+                nonRenewableOptimizedData.Add(od);
             }
 
-            return notRenewable;
+            return nonRenewableOptimizedData;
+        }
+
+        private Tuple<int, int> CalculateFuleCostAndCO2Emission(OptimizationSettings optimizationSettings, PowerPlant powerPlant, double load)
+        {
+            int cost = 0;
+            int co2emission = 0;
+
+            double x = Scale(load, powerPlant.MinimumOutputPower, powerPlant.MaximumOutputPower, 8, 16);
+            if (powerPlant.Type.ToLower().Equals("gas"))
+            {
+                cost = (int)((8 / x) * optimizationSettings.CostGas * load);
+                co2emission = (int)((0.5 + Math.Pow((x / 5), 2)) * optimizationSettings.CO2Gas * load);
+            }
+            else
+            {
+                cost = (int)((8 / x) * optimizationSettings.CostCoal * load);
+                co2emission = (int)((0.5 + Math.Pow((x / 5), 2)) * optimizationSettings.CO2Coal * load);
+            }
+
+            return new Tuple<int, int>(cost, co2emission);
+
+        }
+
+        private double Scale(double value, double min, double max, double minScale, double maxScale)
+        {
+            double scaled = minScale + (value - min) / (max - min) * (maxScale - minScale);
+            return scaled;
         }
 
         private double WindFunction(double mojaXvrednost, double PmaxWind)

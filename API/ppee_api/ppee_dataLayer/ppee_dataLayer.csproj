@@ -72,6 +72,9 @@
     <Compile Include="Entities\ForecastValues.cs" />
     <Compile Include="Entities\Load.cs" />
     <Compile Include="Entities\MinMaxValues.cs" />
+    <Compile Include="Entities\OptimizationPerHour.cs" />
+    <Compile Include="Entities\OptimizationSettings.cs" />
+    <Compile Include="Entities\OptimizedData.cs" />
     <Compile Include="Entities\PowerPlant.cs" />
     <Compile Include="Entities\Weather.cs" />
     <Compile Include="Entities\WeatherAndLoad.cs" />
