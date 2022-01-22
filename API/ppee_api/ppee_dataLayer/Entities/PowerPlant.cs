@@ -10,6 +10,11 @@ namespace ppee_dataLayer.Entities
 {
     public class PowerPlant
     {
+        public PowerPlant()
+        {
+
+        }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public int Id { get; set; }
@@ -23,10 +28,7 @@ namespace ppee_dataLayer.Entities
         public int NumberOfWindGenerators { get; set; } = 0;
         public string Type { get; set; }
 
-        public PowerPlant()
-        {
-            
-        }
+        
 
     }
 }
