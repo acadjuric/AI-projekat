@@ -91,6 +91,10 @@
     <Compile Include="Migrations\202112271451506_forecast_values_table.designer.cs">
       <DependentUpon>202112271451506_forecast_values_table.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202201222253012_powerPlantTable.cs" />
+    <Compile Include="Migrations\202201222253012_powerPlantTable.designer.cs">
+      <DependentUpon>202201222253012_powerPlantTable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PPEE_DataContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -109,6 +113,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202112271451506_forecast_values_table.resx">
       <DependentUpon>202112271451506_forecast_values_table.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202201222253012_powerPlantTable.resx">
+      <DependentUpon>202201222253012_powerPlantTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

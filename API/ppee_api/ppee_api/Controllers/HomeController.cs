@@ -98,5 +98,39 @@ namespace ppee_api.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"{ex}");
             }
         }
+
+        [HttpPost, Route("api/home/addpowerplant")]
+        public async Task<HttpResponseMessage> AddPowerPlant(dynamic jsonData)
+        {
+            try
+            {
+                 bool retVal = await service.AddPowerPlant(jsonData);
+                if (retVal)
+                   return Request.CreateResponse(HttpStatusCode.OK);
+                else
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest,"Invalid data");
+            }
+            catch(Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"{ex}");
+            }
+        }
+
+        [HttpDelete, Route("api/home/deletepowerplant/{id}")]
+        public async Task<HttpResponseMessage> DeletePowerPlant(int id)
+        {
+            try
+            {
+                bool retVal = await service.DeletePowerPlant(id);
+                if (retVal)
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                else
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid id");
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"{ex}");
+            }
+        }
     }
 }

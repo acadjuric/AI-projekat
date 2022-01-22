@@ -11,6 +11,51 @@ namespace ppee_dataLayer.Services
 {
     public class DatabaseService : IDatabase
     {
+        public async Task<bool> AddPowerPlant(PowerPlant powerPlant)
+        {
+            try
+            {
+                using (var db = new PPEE_DataContext())
+                {
+                    var old = (await db.PowerPlants.ToListAsync()).First(item => item.Name.ToLower().Equals(powerPlant.Name.ToLower()) && item.Type.ToLower().Equals(powerPlant.Type.ToLower()));
+                    if (old == null)
+                    {
+                        db.PowerPlants.Add(powerPlant);
+                        await db.SaveChangesAsync();
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                string a = ex.Message;
+                return false;
+            }
+        }
+
+        public async Task<bool> DeletePowerPlant(int id)
+        {
+            try
+            {
+                using (var db = new PPEE_DataContext())
+                {
+                    var item = (await db.PowerPlants.ToListAsync()).First(x => x.Id.Equals(id));
+                    if (item == null)
+                        return false;
+
+                    db.PowerPlants.Remove(item);
+                    await db.SaveChangesAsync();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string a = ex.Message;
+                return false;
+            }
+        }
+
         public async Task<List<WeatherAndLoad>> LoadFromDataBase()
         {
             try
@@ -53,7 +98,7 @@ namespace ppee_dataLayer.Services
                     return await db.ForecastValues.ToListAsync();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }

@@ -689,5 +689,37 @@ namespace ppee_service.Services
             return Task.FromResult<List<WeatherAndLoad>>(retVal);
         }
 
+        public async Task<bool> AddPowerPlant(dynamic data)
+        {
+            string jsonString = JsonConvert.SerializeObject(data);
+            PowerPlant powerPlant = JsonConvert.DeserializeObject<PowerPlant>(jsonString);
+
+            if (powerPlant.Type.ToLower().Equals("solar"))
+            {
+                int Imax = 1000;
+                powerPlant.MinimumOutputPower = 0;
+                powerPlant.MaximumOutputPower = Imax * powerPlant.Efficiency * powerPlant.SurfaceArea;
+
+            }
+            else if (powerPlant.Type.ToLower().Equals("wind"))
+            {
+                powerPlant.MinimumOutputPower = 0;
+                powerPlant.MaximumOutputPower = (int)(Math.Pow((powerPlant.BladesSweptAreaDiameter / 2), 2) * Math.PI);
+            }
+            else if (powerPlant.Type.ToLower().Equals("hydro"))
+            {
+                powerPlant.MinimumOutputPower = 0;
+            }
+
+            IDatabase dataSloj = new DatabaseService();
+            return await dataSloj.AddPowerPlant(powerPlant);
+
+        }
+
+        public async Task<bool> DeletePowerPlant(int id)
+        {
+            IDatabase dataSloj = new DatabaseService();
+            return await dataSloj.DeletePowerPlant(id);
+        }
     }
 }
