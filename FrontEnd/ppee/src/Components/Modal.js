@@ -112,6 +112,10 @@ class Modal extends Component {
         axios.post(baseUrl + "home/addpowerplant", powerPlant).then(response => {
 
             console.log("Dodavanje -> ", response.data);
+
+            //poziv za dobavljanje novo dodatih generatora
+            this.props.getAllGenerators();
+            
             // ako prodje sve kako treba, zatvoriti modal
             this.props.toggleModal();
 

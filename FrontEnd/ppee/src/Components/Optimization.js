@@ -2,13 +2,15 @@ import React, { Component } from 'react';
 import Modal from './Modal';
 import delteTrash from '../assets/delete1.png'
 import saveIcon from '../assets/save-icon.png'
+import { baseUrl } from '../constants';
+import axios from 'axios';
 
 const generators = [
-    { maxValue: 30, minValue: 10, numberForOptimization: 2, type: "coal" },
-    { maxValue: 20, minValue: 16, numberForOptimization: 2, type: "wind" },
-    { maxValue: 50, minValue: 33, numberForOptimization: 2, type: "solar" },
-    { maxValue: 47, minValue: 26, numberForOptimization: 2, type: "gas" },
-    { maxValue: 56, minValue: 8, numberForOptimization: 2, type: "hydro" },
+    { maximumOutputPower: 30, minimumOutputPower: 10, numberForOptimization: 2, type: "coal" },
+    { maximumOutputPower: 20, minimumOutputPower: 16, numberForOptimization: 2, type: "wind" },
+    { maximumOutputPower: 50, minimumOutputPower: 33, numberForOptimization: 2, type: "solar" },
+    { maximumOutputPower: 47, minimumOutputPower: 26, numberForOptimization: 2, type: "gas" },
+    { maximumOutputPower: 56, minimumOutputPower: 8, numberForOptimization: 2, type: "hydro" },
 
 ]
 
@@ -22,6 +24,22 @@ class Optimization extends Component {
         }
     }
 
+    componentDidMount = () => {
+
+        this.GetAllGenerators();
+
+    }
+
+    GetAllGenerators = () => {
+        axios.get(baseUrl + "home/getpowerplant").then(response => {
+
+            console.log("Server odgovorio-> ", response);
+            this.setState({myGenerators : response.data})
+
+        }).catch(error => {
+            console.log(error);
+        })
+    }
     toggleModal = () => {
 
         this.setState({ showModal: !this.state.showModal });
@@ -67,7 +85,7 @@ class Optimization extends Component {
                 </div>
 
                 {
-                    this.state.showModal && (<Modal toggleModal={this.toggleModal} />)
+                    this.state.showModal && (<Modal toggleModal={this.toggleModal} getAllGenerators={this.GetAllGenerators} />)
                 }
                 {
                     this.state.showSettings &&
@@ -87,10 +105,10 @@ class Optimization extends Component {
                                             <div className={"card-image card-image-" + item.type}></div>
                                             <div className="card-text">
                                                 <h3>Max value</h3>
-                                                <p>{item.maxValue}</p>
+                                                <p>{item.maximumOutputPower}</p>
 
                                                 <h3>Min value</h3>
-                                                <p>{item.minValue}</p>
+                                                <p>{item.minimumOutputPower}</p>
                                                 <h3>Optimization number</h3>
                                                 <input value={item.numberForOptimization} onChange={(event) => this.handleInputChange(index, event)} />
 
