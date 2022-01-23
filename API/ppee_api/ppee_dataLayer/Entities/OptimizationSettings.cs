@@ -13,9 +13,15 @@ namespace ppee_dataLayer.Entities
         public int CostCoal { get; set; }
         public int CostGas { get; set; }
         public int CO2Gas { get; set; }
-        public int CO2Coal { get; set; }
+        public double CO2Coal { get; set; }
         public double WeightFactor { get; set; }
         public List<PowerPlant> PowerPlantsForOptimization { get; set; }
+        public List<IdAndNumber> PowerPlantAndNumberForOptimization { get; set; }
+
+        public OptimizationSettings()
+        {
+
+        }
 
     }
 }

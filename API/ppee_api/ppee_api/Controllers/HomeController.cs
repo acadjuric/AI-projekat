@@ -149,5 +149,34 @@ namespace ppee_api.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"{ex}");
             }
         }
+
+        [HttpGet, Route("api/home/optimizationsettings")]
+        public async Task<HttpResponseMessage> GetDeafultOptimizationSettings()
+        {
+            try
+            {
+                string settingsJSON = await service.GetDefaultOptimizationSettings();
+                    return Request.CreateResponse<string>(HttpStatusCode.OK, settingsJSON);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"{ex}");
+            }
+        }
+
+        [HttpPost, Route("api/home/optimize")]
+        public async Task<HttpResponseMessage> Optimize(dynamic optimizationSettings)
+        {
+            try
+            {
+                string settingsJSON = await service.Optimization(optimizationSettings);
+
+                return Request.CreateResponse<string>(HttpStatusCode.OK, settingsJSON);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"{ex}");
+            }
+        }
     }
 }

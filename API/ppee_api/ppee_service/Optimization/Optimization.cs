@@ -42,22 +42,8 @@ namespace ppee_service.Optimization
 
 
 
-        public async void CreateOptimization()
+        public async void CreateOptimization(OptimizationSettings optimizationSettings)
         {
-            OptimizationSettings optimizationSettings = new OptimizationSettings()
-            {
-                Date = "07/01/2019",
-                OptimizationType = "cost",
-                CostCoal = 35,
-                CostGas = 50,
-                CO2Coal = 100,
-                CO2Gas = 60,
-                WeightFactor = 1,
-                PowerPlantsForOptimization = InitElektrane(),
-            };
-
-            var powerPlants = InitElektrane();
-
             string date = "07/01/2019";
             string startDateTime = date + " 00:00";
             string endDateTme = date + " 23:00";

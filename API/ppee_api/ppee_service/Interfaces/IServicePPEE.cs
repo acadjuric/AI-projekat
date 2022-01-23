@@ -26,5 +26,9 @@ namespace ppee_service.Interfaces
 
         Task<string> GetAllPowerPlants();
 
+        Task<string> GetDefaultOptimizationSettings();
+
+        Task<string> Optimization(dynamic optimizationSettingsDynamic);
+
     }
 }

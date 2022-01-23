@@ -731,5 +731,30 @@ namespace ppee_service.Services
             else
                 return "-1";
         }
+
+        public Task<string> GetDefaultOptimizationSettings()
+        {
+            OptimizationSettings optimizationSettings = new OptimizationSettings();
+            optimizationSettings.CO2Coal = 2.180; //coal units have an emissions rate of 2,180 pounds CO2 per MWh
+            optimizationSettings.CO2Gas = 898; //natural gas units have an average emission rate of 898 pounds CO2 per megawatt-hour
+            optimizationSettings.CostGas = 57; // natural gas combined cycle coming in at $41 to $74 per MWh
+            optimizationSettings.CostCoal = 100; //coal cost between $57 and $148 per megawatt-hour.
+            optimizationSettings.Date = "";
+            optimizationSettings.OptimizationType = "cost";
+            optimizationSettings.PowerPlantsForOptimization = new List<PowerPlant>();
+            optimizationSettings.WeightFactor = 0;
+            optimizationSettings.PowerPlantAndNumberForOptimization = new List<IdAndNumber>();
+
+            return Task.FromResult(JsonConvert.SerializeObject(optimizationSettings));
+        }
+
+        public Task<string> Optimization(dynamic optimizationSettingsDynamic)
+        {
+            string optimizationSettingsJSON = JsonConvert.SerializeObject(optimizationSettingsDynamic);
+
+            OptimizationSettings optimizationSettings = JsonConvert.DeserializeObject<OptimizationSettings>(optimizationSettingsJSON);
+
+            return Task.FromResult("");
+        }
     }
 }
