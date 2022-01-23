@@ -104,6 +104,22 @@ class Optimization extends Component {
         // this.setState({ myGenerators: generators })
     }
 
+    onDateChange = (event) =>{
+
+        var date = new Date(event.target.value)
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        var day = date.getDate();
+
+        var validFormatDate = day + "/" + month + "/" + year;
+        this.setState({ [event.target.id]: validFormatDate })
+        console.log(this.state);
+    }
+
+    handleOptimize = () =>{
+        
+    }
+
     render() {
         return (
             <div className='optimization-container'>
@@ -113,10 +129,15 @@ class Optimization extends Component {
                     <button className='btn-showHide-settings' onClick={this.toggleSettings}>{this.state.showSettings === true ? "Hide Settings" : "Show Settings"}</button>
 
                 </div>
-
+                <div className='optimization-box'>
+                    <span> For date <input id="date" type="date" onChange={this.onDateChange} /> </span>
+                    <button className='btn-44' onClick={this.handleOptimize}>Optimize</button>
+                </div>
                 {
                     this.state.showModal && (<Modal toggleModal={this.toggleModal} getAllGenerators={this.GetAllGenerators} />)
                 }
+
+
                 {
                     this.state.showSettings &&
 
@@ -148,7 +169,7 @@ class Optimization extends Component {
                                     <select className='settings-select'>
                                         <option value="cost">Minimize production costs</option>
                                         <option value="co2">Minimize CO2 emissions</option>
-                                        <option value="both">Fuel cost and CO2</option>
+                                        <option value="both">Production cost and CO2</option>
                                     </select>
                                 </div>
 
@@ -195,7 +216,7 @@ class Optimization extends Component {
 
                                                 <div className="number-text" >
                                                     <h3>Optimization number</h3>
-                                                    <input onChange={(event) => this.handleInputChange(item.Id, event)} />
+                                                    <input type="number" min={0} onChange={(event) => this.handleInputChange(item.Id, event)} />
                                                 </div>
 
 

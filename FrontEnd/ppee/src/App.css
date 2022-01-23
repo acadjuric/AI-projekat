@@ -748,18 +748,27 @@ select::-ms-expand {
   flex-wrap: wrap;
 }
 
+.optimization-box{
+  padding: 5px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  /* background-color: #00a400; */
+}
+
 .btn-showHide-settings{
-  background-color: #42b72a;
+  background-color: #fff;
   border-radius: .5rem;
   box-sizing: border-box;
-  color: #FFFFFF;
+  color: #000;
   display: flex;
   font-size: 16px;
   justify-content: center;
-  padding: 1rem 1.75rem;
+  padding: 0.75rem 0.75rem;
   text-decoration: none;
   margin: auto;
-  width: 200px;
+  width: 150px;
   border: 0;
   cursor: pointer;
   user-select: none;
@@ -769,8 +778,34 @@ select::-ms-expand {
 }
 
 .btn-showHide-settings:hover{
-  background-color: #00a400 ;
+  background-color: #ccc ;
 }
+
+.btn-44{
+  background-color: #42b72a;
+  border-radius: .5rem;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  display: flex;
+  font-size: 16px;
+  justify-content: center;
+  padding: 0.75rem 0.75rem;
+  text-decoration: none;
+  margin: auto;
+  width: 120px;
+  border: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none; 
+  letter-spacing: 1.5px;
+  font-weight: 500;
+  margin: 10px;
+}
+
+.btn-44:hover{
+  background-color: #00a400 ; 
+}
+
 .button-43 {
   background-image: linear-gradient(-180deg, #37AEE2 0%, #1E96C8 100%);
   border-radius: .5rem;
@@ -779,10 +814,10 @@ select::-ms-expand {
   display: flex;
   font-size: 16px;
   justify-content: center;
-  padding: 1rem 1.75rem;
+  padding: 0.75rem 0.75rem;
   text-decoration: none;
   margin: auto;
-  width: 180px;
+  width: 150px;
   border: 0;
   cursor: pointer;
   user-select: none;
@@ -890,7 +925,7 @@ select::-ms-expand {
 
 
 .card-container{
-  background-color: red;
+  /* background-color: red; */
   display: flex;
   flex-wrap: wrap;
 }
