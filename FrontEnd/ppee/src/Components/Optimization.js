@@ -24,13 +24,21 @@ class Optimization extends Component {
             myGenerators: generators,
             showSettings: true,
             isMouseInside: false,
+            date: "",
+            optimizationType: "",
+            costCoal: 0,
+            costGas: 0,
+            cO2Gas: 0,
+            cO2Coal: 0,
+            weightFactor: 0,
+            powerPlantAndNumberForOptimization: []
         }
     }
 
     componentDidMount = () => {
 
         this.GetAllGenerators();
-
+        this.GetDefaultSettings();
     }
 
     GetAllGenerators = () => {
@@ -43,6 +51,28 @@ class Optimization extends Component {
             console.log(error);
         })
     }
+
+    GetDefaultSettings = () => {
+
+        axios.get(baseUrl + "home/optimizationsettings").then(response => {
+
+            console.log("Server odgovorio-> ", JSON.parse(response.data));
+            response.data = JSON.parse(response.data)
+            this.setState({
+                cO2Coal: response.data.CO2Coal,
+                cO2Gas: response.data.CO2Gas,
+                costGas: response.data.CostGas,
+                costCoal: response.data.CostCoal,
+                optimizationType: response.data.OptimizationType,
+                weightFactor: response.data.WeightFactor,
+                powerPlantAndNumberForOptimization: response.data.PowerPlantAndNumberForOptimization
+            })
+
+        }).catch(error => {
+            console.log(error);
+        })
+    }
+
     toggleModal = () => {
 
         this.setState({ showModal: !this.state.showModal });
@@ -69,13 +99,6 @@ class Optimization extends Component {
     handleMouseLeave = () => {
         this.setState({ isMouseInside: false })
     }
-    SaveNumberOfGenerators = (index) => {
-
-        // if (this.state.myGenerators[index] === undefined)
-        //     return;
-
-        // console.log(this.state.myGenerators[index]);
-    }
 
     handleInputChange = (id, event) => {
         console.log(id);
@@ -84,18 +107,20 @@ class Optimization extends Component {
         if (modelExist === undefined) {
             var model = {
                 id: id,
-                number: event.target.value,
+                number: parseInt(event.target.value.toString()),
             }
 
             generatorsAndTheirNumberForOptimization.push(model)
         }
         else {
             var index = generatorsAndTheirNumberForOptimization.indexOf(modelExist);
-            modelExist.number = event.target.value
+            modelExist.number = parseInt(event.target.value)
             generatorsAndTheirNumberForOptimization[index] = modelExist
         }
 
-        console.log(generatorsAndTheirNumberForOptimization);
+        this.setState({
+            powerPlantAndNumberForOptimization: generatorsAndTheirNumberForOptimization
+        })
 
 
         // console.log(generators[index]);
@@ -104,7 +129,7 @@ class Optimization extends Component {
         // this.setState({ myGenerators: generators })
     }
 
-    onDateChange = (event) =>{
+    onDateChange = (event) => {
 
         var date = new Date(event.target.value)
         var month = date.getMonth() + 1;
@@ -116,8 +141,34 @@ class Optimization extends Component {
         console.log(this.state);
     }
 
-    handleOptimize = () =>{
+    handleSettingsInputChange = (event) => {
+        this.setState({ [event.target.id]: event.target.value })
+    }
+
+    handleOptimize = () => {
+        // console.log(this.state.powerPlantAndNumberForOptimization.filter(x=> isNaN(x.number) === false))
+        // console.log(this.state)
+
+        var body ={
+            date: this.state.date,
+            optimizationType: this.state.optimizationType,
+            costCoal: this.state.costCoal,
+            costGas: this.state.costGas,
+            cO2Gas: this.state.cO2Gas,
+            cO2Coal: this.state.cO2Coal,
+            weightFactor: this.state.weightFactor,
+            powerPlantAndNumberForOptimization: this.state.powerPlantAndNumberForOptimization.filter(x=> isNaN(x.number) === false)
+        }
+
+        console.log(body);
         
+        axios.post(baseUrl + "home/optimize", body).then(response=>{
+
+            console.log("Server->", JSON.parse(response.data));
+
+        }).catch(error =>{
+            console.log(error);
+        })
     }
 
     render() {
@@ -148,34 +199,36 @@ class Optimization extends Component {
 
                             <div className='settings-column'>
                                 <div className='settings-box'>
-                                    <label>Coal fuel cost</label> <input type="number" />
+                                    <label>Coal fuel cost</label> <input type="number" id="costCoal" onChange={this.handleSettingsInputChange} value={this.state.costCoal} />
                                 </div>
 
                                 <div className='settings-box'>
-                                    <label>Gas fuel cost</label> <input type="number" />
+                                    <label>Gas fuel cost</label> <input type="number" id="costGas" onChange={this.handleSettingsInputChange}  value={this.state.costGas}/>
                                 </div>
                             </div>
                             <div className='settings-column'>
                                 <div className='settings-box'>
-                                    <label>Coal CO2 emission</label> <input type="number" />
+                                    <label>Coal CO2 emission</label> <input type="number" id="cO2Coal" onChange={this.handleSettingsInputChange} value={this.state.cO2Coal} />
                                 </div >
 
                                 <div className='settings-box'>
-                                    <label>Gas CO2 emission</label> <input type="number" />
+                                    <label>Gas CO2 emission</label> <input type="number" id="cO2Gas" onChange={this.handleSettingsInputChange} value={this.state.cO2Gas} />
                                 </div>
                             </div>
                             <div className='settings-column'>
                                 <div className='settings-box'>
-                                    <select className='settings-select'>
+                                    <select className='settings-select' id="optimizationType" onChange={this.handleSettingsInputChange}>
                                         <option value="cost">Minimize production costs</option>
                                         <option value="co2">Minimize CO2 emissions</option>
                                         <option value="both">Production cost and CO2</option>
                                     </select>
                                 </div>
 
-                                <div className='settings-box'>
-                                    <label>Fuel cost weight factor</label> <input type="number" />
-                                </div>
+                                {this.state.optimizationType === "both" ? (
+                                    <div className='settings-box'>
+                                        <label>Fuel cost weight factor</label> <input type="number" value={this.state.weightFactor} min={0} max={1} id="weightFactor" onChange={this.handleSettingsInputChange} />
+                                    </div>
+                                ) : null}
                             </div>
 
                         </div>
