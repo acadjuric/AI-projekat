@@ -738,7 +738,7 @@ namespace ppee_service.Services
             optimizationSettings.CO2Coal = 215; //Pounds of CO2 emitted per million British thermal units (Btu) of energy for various fuels:
             optimizationSettings.CO2Gas = 117;  // Pounds of CO2 emitted per million British thermal units (Btu) of energy for various fuels:
             optimizationSettings.CostGas = 57; // natural gas combined cycle coming in at $41 to $74 per MWh
-            optimizationSettings.CostCoal = 100; //coal cost between $57 and $148 per megawatt-hour.
+            optimizationSettings.CostCoal = 300; //coal cost between $57 and $148 per megawatt-hour.
             optimizationSettings.Date = "";
             optimizationSettings.OptimizationType = "cost";
             optimizationSettings.PowerPlantsForOptimization = new List<PowerPlant>();
@@ -779,6 +779,9 @@ namespace ppee_service.Services
                 return "-1";
             try
             {
+                if (dayOptimization.Count == 0)
+                    return "Try with more generators";
+
                 return JsonConvert.SerializeObject(dayOptimization);
             }
             catch(Exception ex)

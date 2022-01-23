@@ -9,11 +9,9 @@ namespace ppee_dataLayer.Entities
 {
     public class OptimizationPerHour
     {
-
-        //[Key]
         public DateTime DateTimeOfOptimization { get; set; }
         public int Load { get; set; }
-        public ICollection<OptimizedData> LoadsFromPowerPlants { get; set; }
+        public List<OptimizedData> LoadsFromPowerPlants { get; set; }
 
         public OptimizationPerHour()
         {

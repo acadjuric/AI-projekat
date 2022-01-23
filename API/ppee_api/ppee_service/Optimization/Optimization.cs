@@ -87,6 +87,21 @@ namespace ppee_service.Optimization
 
                 //optimizationPerHour.LoadsFromPowerPlants = optimizedData;
 
+                double sum = optimizedData.Sum(x => x.Load);
+                int optLoad = (int)sum;
+                double diff = Math.Abs((optimizationPerHour.Load - optLoad));
+
+                System.Diagnostics.Debug.WriteLine("---------------------------------------------");
+                System.Diagnostics.Debug.WriteLine($"DateTime: {optimizationPerHour.DateTimeOfOptimization}");
+                System.Diagnostics.Debug.WriteLine($"Predicted: {optimizationPerHour.Load}");
+                System.Diagnostics.Debug.WriteLine($"Optimization: {optLoad}");
+                System.Diagnostics.Debug.WriteLine($"Difference: {diff}");
+                System.Diagnostics.Debug.WriteLine("---------------------------------------------");
+                System.Diagnostics.Debug.WriteLine("");
+
+                if (diff > 1)
+                    return new List<OptimizationPerHour>();
+
                 foreach (OptimizedData od in optimizedData)
                 {
                     optimizationPerHour.LoadsFromPowerPlants.Add(od);
@@ -191,13 +206,13 @@ namespace ppee_service.Optimization
                 }
             }
 
-            int coefficient = 1;
+            double coefficient = 1;
             if (renewableSources > forecast.Load - minimumOutputPowerFromNonRenewableSources)
             {
-                coefficient = (int)((forecast.Load - minimumOutputPowerFromNonRenewableSources) / renewableSources);
+                coefficient = (double)((forecast.Load - minimumOutputPowerFromNonRenewableSources) / renewableSources);
                 foreach (OptimizedData od in optimizedData)
                 {
-                    od.Load *= coefficient;
+                    od.Load = Math.Round((od.Load * coefficient),2);
                 }
             }
 
@@ -315,7 +330,7 @@ namespace ppee_service.Optimization
                 OptimizedData od = new OptimizedData()
                 {
                     Name = powerPlants[i].Name,
-                    Load = optimalSolution[i],
+                    Load = Math.Round(optimalSolution[i],2),
                     Type = powerPlants[i].Type,
                     CO2 = 0,
                     Cost = 0,
