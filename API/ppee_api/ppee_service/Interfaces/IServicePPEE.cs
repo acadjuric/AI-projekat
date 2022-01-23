@@ -28,7 +28,7 @@ namespace ppee_service.Interfaces
 
         Task<string> GetDefaultOptimizationSettings();
 
-        Task<string> Optimization(dynamic optimizationSettingsDynamic);
+        Task<string> OptimizationForDay(dynamic optimizationSettingsDynamic);
 
     }
 }

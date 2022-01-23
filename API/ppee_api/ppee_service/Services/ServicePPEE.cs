@@ -735,8 +735,8 @@ namespace ppee_service.Services
         public Task<string> GetDefaultOptimizationSettings()
         {
             OptimizationSettings optimizationSettings = new OptimizationSettings();
-            optimizationSettings.CO2Coal = 2.180; //coal units have an emissions rate of 2,180 pounds CO2 per MWh
-            optimizationSettings.CO2Gas = 898; //natural gas units have an average emission rate of 898 pounds CO2 per megawatt-hour
+            optimizationSettings.CO2Coal = 215; //Pounds of CO2 emitted per million British thermal units (Btu) of energy for various fuels:
+            optimizationSettings.CO2Gas = 117;  // Pounds of CO2 emitted per million British thermal units (Btu) of energy for various fuels:
             optimizationSettings.CostGas = 57; // natural gas combined cycle coming in at $41 to $74 per MWh
             optimizationSettings.CostCoal = 100; //coal cost between $57 and $148 per megawatt-hour.
             optimizationSettings.Date = "";
@@ -748,13 +748,37 @@ namespace ppee_service.Services
             return Task.FromResult(JsonConvert.SerializeObject(optimizationSettings));
         }
 
-        public Task<string> Optimization(dynamic optimizationSettingsDynamic)
+        public async Task<string> OptimizationForDay(dynamic optimizationSettingsDynamic)
         {
             string optimizationSettingsJSON = JsonConvert.SerializeObject(optimizationSettingsDynamic);
 
             OptimizationSettings optimizationSettings = JsonConvert.DeserializeObject<OptimizationSettings>(optimizationSettingsJSON);
 
-            return Task.FromResult("");
+            IDatabase dataBase = new DatabaseService();
+
+            List<PowerPlant> powerPlants = await dataBase.GetAllPowerPlants();
+
+            optimizationSettings.PowerPlantsForOptimization = new List<PowerPlant>();
+
+            foreach (var item in optimizationSettings.PowerPlantAndNumberForOptimization)
+            {
+                var powerPlant = powerPlants.Find(x => x.Id == item.Id);
+                if (powerPlant != null)
+                {
+                    for (int i = 0; i < item.Number; i++)
+                    {
+                        optimizationSettings.PowerPlantsForOptimization.Add(powerPlant);
+                    }
+                }
+            }
+
+            Optimization.Optimization optimization = new Optimization.Optimization();
+            List<OptimizationPerHour> dayOptimization = await optimization.CreateOptimization(optimizationSettings);
+
+            if (dayOptimization == null)
+                return "-1";
+
+            return JsonConvert.SerializeObject(dayOptimization);
         }
     }
 }

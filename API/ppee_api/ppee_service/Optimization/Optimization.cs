@@ -19,32 +19,32 @@ namespace ppee_service.Optimization
 
         }
 
-        private List<PowerPlant> InitElektrane()
+        //private List<PowerPlant> InitElektrane()
+        //{
+        //    List<PowerPlant> elektrane = new List<PowerPlant>();
+
+        //    PowerPlant e1 = new PowerPlant() { Type = "hidro", MaximumOutputPower = 4000, MinimumOutputPower = 10 };
+        //    PowerPlant e2 = new PowerPlant() { Type = "hidro", MaximumOutputPower = 2000, MinimumOutputPower = 15 };
+        //    PowerPlant e3 = new PowerPlant() { Type = "solar", Efficiency = 40, SurfaceArea = 150 };
+        //    PowerPlant e4 = new PowerPlant() { Type = "solar", Efficiency = 18, SurfaceArea = 120 };
+        //    PowerPlant e5 = new PowerPlant() { Type = "wind", BladesSweptAreaDiameter = 40, NumberOfWindGenerators = 30 };
+        //    PowerPlant e6 = new PowerPlant() { Type = "wind", BladesSweptAreaDiameter = 75, NumberOfWindGenerators = 10 };
+        //    PowerPlant e7 = new PowerPlant() { Type = "coal", MaximumOutputPower = 300, MinimumOutputPower = 70 };
+        //    PowerPlant e8 = new PowerPlant() { Type = "coal", MaximumOutputPower = 500, MinimumOutputPower = 100 };
+        //    PowerPlant e9 = new PowerPlant() { Type = "gas", MaximumOutputPower = 250, MinimumOutputPower = 90 };
+        //    PowerPlant e10 = new PowerPlant() { Type = "gas", MaximumOutputPower = 340, MinimumOutputPower = 130 };
+
+        //    elektrane.Add(e1); elektrane.Add(e2); elektrane.Add(e3); elektrane.Add(e4); elektrane.Add(e5);
+        //    elektrane.Add(e6); elektrane.Add(e7); elektrane.Add(e8); elektrane.Add(e9); elektrane.Add(e10);
+
+        //    return elektrane;
+        //}
+
+
+
+        public async Task<List<OptimizationPerHour>> CreateOptimization(OptimizationSettings optimizationSettings)
         {
-            List<PowerPlant> elektrane = new List<PowerPlant>();
-
-            PowerPlant e1 = new PowerPlant() { Type = "hidro", MaximumOutputPower = 4000, MinimumOutputPower = 10 };
-            PowerPlant e2 = new PowerPlant() { Type = "hidro", MaximumOutputPower = 2000, MinimumOutputPower = 15 };
-            PowerPlant e3 = new PowerPlant() { Type = "solar", Efficiency = 40, SurfaceArea = 150 };
-            PowerPlant e4 = new PowerPlant() { Type = "solar", Efficiency = 18, SurfaceArea = 120 };
-            PowerPlant e5 = new PowerPlant() { Type = "wind", BladesSweptAreaDiameter = 40, NumberOfWindGenerators = 30 };
-            PowerPlant e6 = new PowerPlant() { Type = "wind", BladesSweptAreaDiameter = 75, NumberOfWindGenerators = 10 };
-            PowerPlant e7 = new PowerPlant() { Type = "coal", MaximumOutputPower = 300, MinimumOutputPower = 70 };
-            PowerPlant e8 = new PowerPlant() { Type = "coal", MaximumOutputPower = 500, MinimumOutputPower = 100 };
-            PowerPlant e9 = new PowerPlant() { Type = "gas", MaximumOutputPower = 250, MinimumOutputPower = 90 };
-            PowerPlant e10 = new PowerPlant() { Type = "gas", MaximumOutputPower = 340, MinimumOutputPower = 130 };
-
-            elektrane.Add(e1); elektrane.Add(e2); elektrane.Add(e3); elektrane.Add(e4); elektrane.Add(e5);
-            elektrane.Add(e6); elektrane.Add(e7); elektrane.Add(e8); elektrane.Add(e9); elektrane.Add(e10);
-
-            return elektrane;
-        }
-
-
-
-        public async void CreateOptimization(OptimizationSettings optimizationSettings)
-        {
-            string date = "07/01/2019";
+            string date = optimizationSettings.Date;
             string startDateTime = date + " 00:00";
             string endDateTme = date + " 23:00";
 
@@ -66,13 +66,15 @@ namespace ppee_service.Optimization
                 WebClient webClient = new WebClient();
                 result = webClient.DownloadString(api);
             }
-            catch { return; }
+            catch { return null; }
 
             var jsonResult = JsonConvert.DeserializeObject<dynamic>(result);
 
             List<double> sunAnglesForHours = GetSunAngleInRadiansForHours(jsonResult);
             List<CloudsAndWindSpeed> cloudsAndWindSpeeds = GetCloudsAndWindSpeedFromJson(jsonResult);
 
+
+            List<OptimizationPerHour> dayOptimization = new List<OptimizationPerHour>();
 
             for (int i = 0; i < predictionHours.Count; i++)
             {
@@ -93,9 +95,10 @@ namespace ppee_service.Optimization
                 }
 
                 //upis u bazu
+                dayOptimization.Add(optimizationPerHour);
             }
 
-
+            return dayOptimization;
         }
 
 

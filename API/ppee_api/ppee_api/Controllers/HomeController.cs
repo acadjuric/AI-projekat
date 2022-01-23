@@ -104,13 +104,13 @@ namespace ppee_api.Controllers
         {
             try
             {
-                 bool retVal = await service.AddPowerPlant(jsonData);
+                bool retVal = await service.AddPowerPlant(jsonData);
                 if (retVal)
-                   return Request.CreateResponse(HttpStatusCode.OK);
+                    return Request.CreateResponse(HttpStatusCode.OK);
                 else
-                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest,"Invalid data");
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid data");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"{ex}");
             }
@@ -156,7 +156,7 @@ namespace ppee_api.Controllers
             try
             {
                 string settingsJSON = await service.GetDefaultOptimizationSettings();
-                    return Request.CreateResponse<string>(HttpStatusCode.OK, settingsJSON);
+                return Request.CreateResponse<string>(HttpStatusCode.OK, settingsJSON);
             }
             catch (Exception ex)
             {
@@ -169,9 +169,11 @@ namespace ppee_api.Controllers
         {
             try
             {
-                string settingsJSON = await service.Optimization(optimizationSettings);
-
-                return Request.CreateResponse<string>(HttpStatusCode.OK, settingsJSON);
+                string result = await service.OptimizationForDay(optimizationSettings);
+                if (result != "-1")
+                    return Request.CreateResponse<string>(HttpStatusCode.OK, result);
+                else
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid request");
             }
             catch (Exception ex)
             {
