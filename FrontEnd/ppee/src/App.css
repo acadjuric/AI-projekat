@@ -883,14 +883,11 @@ select::-ms-expand {
 
 /*KARTICE GENERATORA*/
 .settings-container{
-  background-color: lime;
+  /* background-color: lime; */
   display: block;
 }
 
-.basic-settings{
-  background-color: rebeccapurple;
-  margin-top: 10px;
-}
+
 
 .card-container{
   background-color: red;
@@ -900,9 +897,9 @@ select::-ms-expand {
 .card {
 
   display: grid;
-  grid-template-columns: 200px;
-  grid-template-rows: 165px 170px 25px;
-  grid-template-areas: "image" "text" "stats";
+  grid-template-columns: 210px;
+  grid-template-rows: 165px 160px 45px 25px;
+  grid-template-areas: "image" "text" "buttons" "stats";
   background: #1d1d1d;
   color:white;
   text-align: center;
@@ -949,16 +946,44 @@ select::-ms-expand {
 }
 
 .card-text {
+  display: grid;
+  grid-template-rows: 210px;
+  grid-template-rows: 35px 35px 35px 45px;
+  grid-template-areas: "name" "max" "min" "number";
   grid-area: text;
   margin: 5px;
 }
+
+.card-text .name-text{
+  grid-area: name;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-text .max-text{
+  grid-area: max;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-text .min-text{
+  grid-area: min;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-text .number-text{
+  grid-area: number;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 .card-text p {
+  margin: 7px;
   font-size:15px;
+  
   font-weight: 300;
 }
 .card-text h3 {
-  margin-top:0px;
+  width: 100px;
+  margin:5px;
   font-size:15px;
+  float:left !important;
   letter-spacing: 1px;
 }
 
@@ -1023,10 +1048,11 @@ select::-ms-expand {
 }
 
 .card-BtnContainer{
-  margin-top: 10px;
+  /* background-color: #00a400; */
   width: 100%;
   display:inline-flex;
   justify-content:space-evenly;
+  margin-bottom: 5px;
 }
 
 .card-BtnContainer button{
@@ -1052,3 +1078,62 @@ background-color: red;
   
 }
 
+.basic-settings{
+  /* background-color: rebeccapurple; */
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.settings-column{
+  width: 350px;
+  margin: 10px;
+  /* background-color: red; */
+}
+
+.settings-box{
+  width: 100%;
+  /* background-color: #1877f2; */
+  margin: 10px 0px;
+  text-align: left;
+
+}
+.settings-box label{
+  font-size: 20px;
+  /* background-color: #00a400; */
+  text-align: left;
+  color: #fff;
+}
+
+.settings-box input {
+  width: 100px;
+  height: 35px;
+  outline: none;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.settings-column .settings-select{
+  height: 35px;
+  outline:0;
+  border:0;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 5px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(2.4px);
+  -webkit-backdrop-filter: blur(2.4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex: 1;
+  padding: 0 .5em;
+  color:#fff;
+  cursor:pointer;
+  font-size: 1em;
+  font-family: 'Open Sans', sans-serif;
+}
