@@ -1,70 +1,177 @@
 import React, { Component } from 'react';
+import { baseUrl } from '../constants';
+import axios from 'axios';
 
-const powerPlantTypes = ["Coal", "Gas", "Hydropower", "Wind","Solar"]
+const powerPlantTypes = ["Coal", "Gas", "Hydro", "Wind", "Solar"]
 
 class Modal extends Component {
     constructor() {
         super();
         this.state = {
-            maxProductionValue: 0,
-            minProductionValue: 0,
-            productionType: 'Coal',
+            type: "Coal",
+            maximumOutputPower: 0,
+            minimumOutputPower: 0,
+            name: "",
+            efficiency: 0,
+            surfaceArea: 0,
+            bladesSweptAreaDiameter: 10,
+            numberOfWindGenerators: 10,
+            firstPlaceHolder: "Max output power",
+            secondPlaceHolder: "Min output power",
+            minPowerDisabled: false,
         }
     }
 
     handleInputChange = event => {
-        this.setState({
-            [event.target.id]: event.target.value
-        })
+
+        if (event.target.id === "type") {
+            if (event.target.value === "Wind") {
+                this.setState({
+                    type: event.target.value,
+                    firstPlaceHolder: "Blades swept area diameter",
+                    secondPlaceHolder: "Number of wind generators",
+                    minPowerDisabled: false,
+                })
+            }
+            else if (event.target.value === "Solar") {
+                this.setState({
+                    type: event.target.value,
+                    firstPlaceHolder: "Surface area",
+                    secondPlaceHolder: "Efficiency",
+                    minPowerDisabled: false,
+                })
+            }
+            else if (event.target.value === "Hydro") {
+                this.setState({
+                    type: event.target.value,
+                    firstPlaceHolder: "Max output power",
+                    minPowerDisabled: true,
+                })
+            }
+            else {
+                this.setState({
+                    minPowerDisabled: false,
+                    firstPlaceHolder: "Max output power",
+                    secondPlaceHolder: "Min output power",
+                })
+            }
+        }
+
+        this.setState({ [event.target.id]: event.target.value })
+        
     }
 
 
 
     handleSubmit = () => {
 
-        console.log(this.state);
+        var powerPlant = {
+            type: "",
+            maximumOutputPower: 0,
+            minimumOutputPower: 0,
+            name: "",
+            efficiency: 0,
+            surfaceArea: 0,
+            bladesSweptAreaDiameter: 0,
+            numberOfWindGenerators: 0,
+        }
 
-        //ako prodje sve kako treba, zatvoriti modal
-        //this.props.toggleModal();
+        if (this.state.type === "Wind") {
+            powerPlant.bladesSweptAreaDiameter = this.state.maximumOutputPower;
+            powerPlant.numberOfWindGenerators = this.state.minimumOutputPower;
+            powerPlant.type = "wind";
+            powerPlant.name = this.state.name;
+        }
+        else if (this.state.type === "Solar") {
+            powerPlant.surfaceArea = this.state.maximumOutputPower;
+            powerPlant.efficiency = this.state.minimumOutputPower;
+            powerPlant.type = "solar";
+            powerPlant.name = this.state.name;
+        }
+        else if (this.state.type === "Hydro") {
+            powerPlant.maximumOutputPower = this.state.maximumOutputPower;
+            powerPlant.minimumOutputPower = 0;
+            powerPlant.type = "hydro";
+            powerPlant.name =this.state.name;
+        }
+        else if(this.state.type === "Coal"){
+            powerPlant.maximumOutputPower = this.state.maximumOutputPower;
+            powerPlant.minimumOutputPower = this.state.minimumOutputPower;
+            powerPlant.type = "coal";
+            powerPlant.name =this.state.name;
+        }
+        else if(this.state.type === "Gas"){
+            powerPlant.maximumOutputPower = this.state.maximumOutputPower;
+            powerPlant.minimumOutputPower = this.state.minimumOutputPower;
+            powerPlant.type = "gas";
+            powerPlant.name =this.state.name;
+        }
+
+        console.log(powerPlant);
+
+        axios.post(baseUrl + "home/addpowerplant", powerPlant).then(response => {
+
+            console.log("Dodavanje -> ", response.data);
+            // ako prodje sve kako treba, zatvoriti modal
+            this.props.toggleModal();
+
+        }).catch(error => {
+            console.log(error);
+        })
+
+        
     }
 
     CloseModal = event => {
         //da ne zatvori modal kad se klikne na input polje
-        if(event.target.id !== "overlay")
+        if (event.target.id !== "overlay")
             return;
 
         this.setState({
-            maxProductionValue: 0,
-            minProductionValue: 0,
-            productionType: undefined,
+            type: "wind",
+            maximumOutputPower: 0,
+            minimumOutputPower: 0,
+            name: "Vetro",
+            efficiency: 0,
+            surfaceArea: 0,
+            bladesSweptAreaDiameter: 10,
+            numberOfWindGenerators: 10
         })
         this.props.toggleModal();
     }
 
     render() {
         return (
-                <div className='modal-overlay' onClick={this.CloseModal} id="overlay">
-                    <div className="modal-form">
-                        <h3 className='modal-header'>Generator form</h3>
+            <div className='modal-overlay' onClick={this.CloseModal} id="overlay">
+                <div className="modal-form">
+                    <h3 className='modal-header'>Generator form</h3>
 
-                        <label className='modal-label' htmlFor="maxProductionValue">Max Production Value</label>
-                        <input className='modal-input' type="text" placeholder="max production value" id="maxProductionValue" onChange={this.handleInputChange} />
+                    <label className='modal-label' htmlFor="minProductionValue">Power plant production type</label>
+                    <select className='modal-select' id='type' value={this.state.productionType} onChange={this.handleInputChange}>
+                        {
+                            powerPlantTypes.map(item => {
+                                return <option key={item} value={item}>{item}</option>
+                            })
+                        }
+                    </select>
 
-                        <label className='modal-label' htmlFor="minProductionValue">Min Production Value</label>
-                        <input className='modal-input' type="text" placeholder="min production value" id="minProductionValue" onChange={this.handleInputChange} />
+                    <input className='modal-input' type="text" placeholder="Name" id="name" onChange={this.handleInputChange} />
 
-                        <label className='modal-label' htmlFor="minProductionValue">Power plant production type</label>
-                        <select className='modal-select' id='productionType' value={this.state.productionType} onChange={this.handleInputChange}>
-                            {
-                                powerPlantTypes.map(item => {
-                                    return <option key={item} value={item}>{item}</option>
-                                })
-                            }
-                        </select>
+                    {/* <label className='modal-label' htmlFor="maxProductionValue">{this.state.firstPlaceHolder}</label> */}
+                    <input className='modal-input' type="text" placeholder={this.state.firstPlaceHolder} id="maximumOutputPower" onChange={this.handleInputChange} />
 
-                        <button className='modal-submit' onClick={this.handleSubmit}>Submit</button>
-                    </div>
+                    {/* <label className='modal-label' htmlFor="minProductionValue">{this.state.secondPlaceHolder} </label> */}
+                    {this.state.minPowerDisabled ? null :
+                        (< input className='modal-input' type="text" placeholder={this.state.secondPlaceHolder} id="minimumOutputPower" onChange={this.handleInputChange} />)
+                    }
+
+
+
+
+
+                    <button className='modal-submit' onClick={this.handleSubmit}>Submit</button>
                 </div>
+            </div>
         );
     }
 }
