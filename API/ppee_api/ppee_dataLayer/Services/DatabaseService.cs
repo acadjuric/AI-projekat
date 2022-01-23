@@ -56,6 +56,23 @@ namespace ppee_dataLayer.Services
             }
         }
 
+        public async Task<List<PowerPlant>> GetAllPowerPlants()
+        {
+            try
+            {
+                using(var db = new PPEE_DataContext())
+                {
+                    return await db.PowerPlants.ToListAsync();
+                }
+               
+            }
+            catch(Exception ex)
+            {
+                string a = ex.Message;
+                return new List<PowerPlant>();
+            }
+        }
+
         public async Task<List<WeatherAndLoad>> LoadFromDataBase()
         {
             try

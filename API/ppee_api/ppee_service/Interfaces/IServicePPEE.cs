@@ -24,5 +24,7 @@ namespace ppee_service.Interfaces
 
         Task<bool> DeletePowerPlant(int id);
 
+        Task<string> GetAllPowerPlants();
+
     }
 }

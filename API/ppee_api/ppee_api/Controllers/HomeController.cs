@@ -132,5 +132,22 @@ namespace ppee_api.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"{ex}");
             }
         }
+
+        [HttpGet, Route("api/home/getpowerplant")]
+        public async Task<HttpResponseMessage> GetAllPowerPlants()
+        {
+            try
+            {
+                var retVal = await service.GetAllPowerPlants();
+                if (retVal != "-1")
+                    return Request.CreateResponse<string>(HttpStatusCode.OK, retVal);
+                else
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "No data");
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"{ex}");
+            }
+        }
     }
 }

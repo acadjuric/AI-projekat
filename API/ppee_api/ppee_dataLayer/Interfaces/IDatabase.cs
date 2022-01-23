@@ -24,5 +24,7 @@ namespace ppee_dataLayer.Interfaces
         Task<bool> AddPowerPlant(PowerPlant powerPlant);
 
         Task<bool> DeletePowerPlant(int id);
+
+        Task<List<PowerPlant>> GetAllPowerPlants();
     }
 }

@@ -721,5 +721,15 @@ namespace ppee_service.Services
             IDatabase dataSloj = new DatabaseService();
             return await dataSloj.DeletePowerPlant(id);
         }
+
+        public async Task<string> GetAllPowerPlants()
+        {
+            IDatabase dataSloj = new DatabaseService();
+            var result = await dataSloj.GetAllPowerPlants();
+            if (result.Count > 0)
+                return JsonConvert.SerializeObject(result);
+            else
+                return "-1";
+        }
     }
 }
