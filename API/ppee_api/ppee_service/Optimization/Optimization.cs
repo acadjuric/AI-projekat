@@ -102,20 +102,55 @@ namespace ppee_service.Optimization
                 if (diff > 1)
                     return new List<OptimizationPerHour>();
 
+                double solarLoad = 0;
+                double windLoad = 0;
+                double hydroLoad = 0;
+                double coalLoad = 0;
+                double gasLoad = 0;
+
                 foreach (OptimizedData od in optimizedData)
                 {
                     optimizationPerHour.LoadsFromPowerPlants.Add(od);
+
+                    if (od.Type.ToLower().Equals("solar"))
+                        solarLoad += od.Load;
+
+                    else if (od.Type.ToLower().Equals("wind"))
+                        windLoad += od.Load;
+
+                    else if (od.Type.ToLower().Equals("hydro"))
+                        hydroLoad += od.Load;
+
+                    else if (od.Type.ToLower().Equals("coal"))
+                        coalLoad += od.Load;
+
+                    else if (od.Type.ToLower().Equals("gas"))
+                        gasLoad += od.Load;
                 }
+
+                solarLoad = Math.Round(solarLoad, 2);
+                windLoad = Math.Round(windLoad, 2);
+                hydroLoad = Math.Round(hydroLoad, 2);
+                coalLoad = Math.Round(coalLoad, 2);
+                gasLoad = Math.Round(gasLoad, 2);
+
+                optimizationPerHour.SolarLoad = solarLoad;
+                optimizationPerHour.WindLoad = windLoad;
+                optimizationPerHour.HydroLoad = hydroLoad;
+                optimizationPerHour.CoalLoad = coalLoad;
+                optimizationPerHour.GasLoad = gasLoad;
 
                 double priceSum = optimizedData.Sum(x => x.Cost);
                 priceSum = Math.Round(priceSum, 2);
 
-                double emissionSum = optimizedData.Sum(x=> x.CO2);
+                double emissionSum = optimizedData.Sum(x => x.CO2);
                 emissionSum = Math.Round(emissionSum, 2);
 
                 optimizationPerHour.Emission = emissionSum;
                 optimizationPerHour.Price = priceSum;
                 optimizationPerHour.LoadSum = Math.Round(sum, 2);
+
+
 
                 //upis u bazu
                 dayOptimization.Add(optimizationPerHour);
@@ -222,7 +257,7 @@ namespace ppee_service.Optimization
                 coefficient = (double)((forecast.Load - minimumOutputPowerFromNonRenewableSources) / renewableSources);
                 foreach (OptimizedData od in optimizedData)
                 {
-                    od.Load = Math.Round((od.Load * coefficient),2);
+                    od.Load = Math.Round((od.Load * coefficient), 2);
                 }
             }
 
@@ -340,7 +375,7 @@ namespace ppee_service.Optimization
                 OptimizedData od = new OptimizedData()
                 {
                     Name = powerPlants[i].Name,
-                    Load = Math.Round(optimalSolution[i],2),
+                    Load = Math.Round(optimalSolution[i], 2),
                     Type = powerPlants[i].Type,
                     CO2 = 0,
                     Cost = 0,
