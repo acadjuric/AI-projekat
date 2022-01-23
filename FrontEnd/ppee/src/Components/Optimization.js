@@ -20,9 +20,10 @@ class Optimization extends Component {
     constructor() {
         super();
         this.state = {
+            optimizationResult: [],
             showModal: false,
             myGenerators: generators,
-            showSettings: true,
+            showSettings: false,
             isMouseInside: false,
             date: "",
             optimizationType: "",
@@ -149,6 +150,17 @@ class Optimization extends Component {
         this.setState({ [event.target.id]: event.target.value })
     }
 
+    getValidDateFormatForOutput = (date,load) => {
+        // input date in format -> yyyy-MM-dd(T)HH:mm:ss; Example -> 2019-01-04T13:00:00
+        var parts = date.split('T');
+        var dateParts = parts[0].split('-');
+        var timeParts = parts[1].split(':');
+
+        //output -> MM/dd/yyyy  HH:mm   --> load
+        var dateForOutput = dateParts[1] + "/" + dateParts[2] + "/" + dateParts[0] + "  " + timeParts[0] + ":" + timeParts[1] + "  =>  " + load;
+        return dateForOutput;
+    }
+
     handleOptimize = () => {
         // console.log(this.state.powerPlantAndNumberForOptimization.filter(x=> isNaN(x.number) === false))
         // console.log(this.state)
@@ -168,7 +180,14 @@ class Optimization extends Component {
 
         axios.post(baseUrl + "home/optimize", body).then(response => {
 
-            console.log("Server->", JSON.parse(response.data));
+            try {
+                console.log("Server->", JSON.parse(response.data));
+
+                this.setState({ optimizationResult: JSON.parse(response.data) })
+            }
+            catch {
+                alert(response.data);
+            }
 
         }).catch(error => {
             console.log(error);
@@ -299,8 +318,131 @@ class Optimization extends Component {
                             }
 
                         </div>
+
+
                     </div>
                 }
+                <div className='tables-container'>
+                    {
+                        this.state.optimizationResult && this.state.optimizationResult.map((optimizationPerHour, index) => {
+                            return (
+                                <div className='one-table' key={index}>
+                                    <div className="tbl-header">
+                                        <table className='optimization-table' cellPadding="0" cellSpacing="0" border="0">
+                                            <thead>
+                                                <tr>
+                                                    <th colSpan={5} className="opt-th th-datetime">{this.getValidDateFormatForOutput(optimizationPerHour.DateTimeOfOptimization, optimizationPerHour.Load)}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th className="opt-th">Name</th>
+                                                    <th className="opt-th">Type</th>
+                                                    <th className="opt-th">Load</th>
+                                                    <th className="opt-th">Cost</th>
+                                                    <th className="opt-th">CO2</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                    <div className="tbl-content">
+                                        <table className='optimization-table' cellPadding="0" cellSpacing="0" border="0">
+                                            <tbody>
+                                                {
+                                                    optimizationPerHour.LoadsFromPowerPlants && optimizationPerHour.LoadsFromPowerPlants.map((optimizedData, index) => {
+                                                        return (
+                                                            <tr key={optimizationPerHour.DateTimeOfOptimization + index.toString()}>
+
+                                                                <td className="opt-td">{optimizedData.Name}</td>
+                                                                <td className="opt-td">{optimizedData.Type}</td>
+                                                                <td className="opt-td">{optimizedData.Load}</td>
+                                                                <td className="opt-td">{optimizedData.Cost}</td>
+                                                                <td className="opt-td">{optimizedData.CO2}</td>
+
+                                                            </tr>
+                                                        )
+                                                    })
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+
+                <div className='tables-container'>
+                    <div className='one-table'>
+                        <div className="tbl-header">
+                            <table className='optimization-table' cellPadding="0" cellSpacing="0" border="0">
+                                <thead>
+                                    <tr>
+                                        <th colSpan={5} className="opt-th th-datetime">04/01/2019 00:00</th>
+                                    </tr>
+                                    <tr>
+                                        <th className="opt-th">Name</th>
+                                        <th className="opt-th">Type</th>
+                                        <th className="opt-th">Load</th>
+                                        <th className="opt-th">Cost</th>
+                                        <th className="opt-th">CO2</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div className="tbl-content">
+                            <table className='optimization-table' cellPadding="0" cellSpacing="0" border="0">
+                                <tbody>
+                                    <tr>
+                                        <td className="opt-td">AAC</td>
+                                        <td className="opt-td">AUSTRALIAN COMPANY </td>
+                                        <td className="opt-td">$1.38</td>
+                                        <td className="opt-td">+2.01</td>
+                                        <td className="opt-td">-0.36%</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td className='opt-td'>OVERALL</td>
+                                        <td className='opt-td'></td>
+                                        <td className='opt-td'>19560 [MW]</td>
+                                        <td className='opt-td'>999999124241 $</td>
+                                        <td className='opt-td'>835871348313 [BTU]</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div className='one-table'>
+                        <div className="tbl-header">
+                            <table className='optimization-table' cellPadding="0" cellSpacing="0" border="0">
+                                <thead>
+                                    <tr>
+                                        <th colSpan={5} className="opt-th th-datetime">04/01/2019 00:00</th>
+                                    </tr>
+                                    <tr>
+                                        <th className="opt-th">Name</th>
+                                        <th className="opt-th">Type</th>
+                                        <th className="opt-th">Load</th>
+                                        <th className="opt-th">Cost</th>
+                                        <th className="opt-th">CO2</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div className="tbl-content">
+                            <table className='optimization-table' cellPadding="0" cellSpacing="0" border="0">
+                                <tbody>
+                                    <tr>
+                                        <td className="opt-td">AAC</td>
+                                        <td className="opt-td">AUSTRALIAN COMPANY </td>
+                                        <td className="opt-td">$1.38</td>
+                                        <td className="opt-td">+2.01</td>
+                                        <td className="opt-td">-0.36%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         );
     }
