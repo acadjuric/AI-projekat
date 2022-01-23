@@ -136,6 +136,10 @@ class Optimization extends Component {
         var year = date.getFullYear();
         var day = date.getDate();
 
+        if (day < 10) day = "0" + day;
+        if (month < 10) month = "0" + month;
+
+
         var validFormatDate = day + "/" + month + "/" + year;
         this.setState({ [event.target.id]: validFormatDate })
         console.log(this.state);
@@ -149,7 +153,7 @@ class Optimization extends Component {
         // console.log(this.state.powerPlantAndNumberForOptimization.filter(x=> isNaN(x.number) === false))
         // console.log(this.state)
 
-        var body ={
+        var body = {
             date: this.state.date,
             optimizationType: this.state.optimizationType,
             costCoal: this.state.costCoal,
@@ -157,16 +161,16 @@ class Optimization extends Component {
             cO2Gas: this.state.cO2Gas,
             cO2Coal: this.state.cO2Coal,
             weightFactor: this.state.weightFactor,
-            powerPlantAndNumberForOptimization: this.state.powerPlantAndNumberForOptimization.filter(x=> isNaN(x.number) === false)
+            powerPlantAndNumberForOptimization: this.state.powerPlantAndNumberForOptimization.filter(x => isNaN(x.number) === false)
         }
 
         console.log(body);
-        
-        axios.post(baseUrl + "home/optimize", body).then(response=>{
+
+        axios.post(baseUrl + "home/optimize", body).then(response => {
 
             console.log("Server->", JSON.parse(response.data));
 
-        }).catch(error =>{
+        }).catch(error => {
             console.log(error);
         })
     }
@@ -203,7 +207,7 @@ class Optimization extends Component {
                                 </div>
 
                                 <div className='settings-box'>
-                                    <label>Gas fuel cost</label> <input type="number" id="costGas" onChange={this.handleSettingsInputChange}  value={this.state.costGas}/>
+                                    <label>Gas fuel cost</label> <input type="number" id="costGas" onChange={this.handleSettingsInputChange} value={this.state.costGas} />
                                 </div>
                             </div>
                             <div className='settings-column'>
