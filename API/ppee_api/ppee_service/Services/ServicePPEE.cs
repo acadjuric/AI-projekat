@@ -777,8 +777,16 @@ namespace ppee_service.Services
 
             if (dayOptimization == null)
                 return "-1";
-
-            return JsonConvert.SerializeObject(dayOptimization);
+            try
+            {
+                return JsonConvert.SerializeObject(dayOptimization);
+            }
+            catch(Exception ex)
+            {
+                string a = ex.Message;
+                return "-1";
+            }
+            
         }
     }
 }

@@ -5,6 +5,7 @@ using ppee_dataLayer.Interfaces;
 using ppee_dataLayer.Services;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -18,29 +19,6 @@ namespace ppee_service.Optimization
         {
 
         }
-
-        //private List<PowerPlant> InitElektrane()
-        //{
-        //    List<PowerPlant> elektrane = new List<PowerPlant>();
-
-        //    PowerPlant e1 = new PowerPlant() { Type = "hidro", MaximumOutputPower = 4000, MinimumOutputPower = 10 };
-        //    PowerPlant e2 = new PowerPlant() { Type = "hidro", MaximumOutputPower = 2000, MinimumOutputPower = 15 };
-        //    PowerPlant e3 = new PowerPlant() { Type = "solar", Efficiency = 40, SurfaceArea = 150 };
-        //    PowerPlant e4 = new PowerPlant() { Type = "solar", Efficiency = 18, SurfaceArea = 120 };
-        //    PowerPlant e5 = new PowerPlant() { Type = "wind", BladesSweptAreaDiameter = 40, NumberOfWindGenerators = 30 };
-        //    PowerPlant e6 = new PowerPlant() { Type = "wind", BladesSweptAreaDiameter = 75, NumberOfWindGenerators = 10 };
-        //    PowerPlant e7 = new PowerPlant() { Type = "coal", MaximumOutputPower = 300, MinimumOutputPower = 70 };
-        //    PowerPlant e8 = new PowerPlant() { Type = "coal", MaximumOutputPower = 500, MinimumOutputPower = 100 };
-        //    PowerPlant e9 = new PowerPlant() { Type = "gas", MaximumOutputPower = 250, MinimumOutputPower = 90 };
-        //    PowerPlant e10 = new PowerPlant() { Type = "gas", MaximumOutputPower = 340, MinimumOutputPower = 130 };
-
-        //    elektrane.Add(e1); elektrane.Add(e2); elektrane.Add(e3); elektrane.Add(e4); elektrane.Add(e5);
-        //    elektrane.Add(e6); elektrane.Add(e7); elektrane.Add(e8); elektrane.Add(e9); elektrane.Add(e10);
-
-        //    return elektrane;
-        //}
-
-
 
         public async Task<List<OptimizationPerHour>> CreateOptimization(OptimizationSettings optimizationSettings)
         {
@@ -57,16 +35,34 @@ namespace ppee_service.Optimization
             IDatabase dataSloj = new DatabaseService();
 
             List<ForecastValues> forecastValues = await dataSloj.LoadPredictedValues();
-
-            List<ForecastValues> predictionHours = forecastValues.Where(x => DateTime.Parse(x.DateAndTime) >= DateTime.Parse(startDateTime) && DateTime.Parse(x.DateAndTime) <= DateTime.Parse(endDateTme)).ToList();
-
+            List<ForecastValues> predictionHours = new List<ForecastValues>();
             try
             {
+                DateTime startDate;
+                DateTime endDate;
+
+                DateTime.TryParseExact(startDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out startDate);
+                DateTime.TryParseExact(endDateTme, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out endDate);
+
+                foreach (var item in forecastValues)
+                {
+                    DateTime temp;
+                    DateTime.TryParseExact(item.DateAndTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out temp);
+
+                    if (temp >= startDate && temp <= endDate)
+                        predictionHours.Add(item);
+                }
+
+                //predictionHours = forecastValues.Where(x => DateTime.Parse(x.DateAndTime) >= DateTime.Parse(startDateTime) && DateTime.Parse(x.DateAndTime) <= DateTime.Parse(endDateTme)).ToList();
                 string api = $"https://api.openweathermap.org/data/2.5/onecall/timemachine?lat={lat}&lon={lon}&dt={time}&appid={apiKey}";
                 WebClient webClient = new WebClient();
                 result = webClient.DownloadString(api);
             }
-            catch { return null; }
+            catch (Exception ex)
+            {
+                string a = ex.Message;
+                return null;
+            }
 
             var jsonResult = JsonConvert.DeserializeObject<dynamic>(result);
 
@@ -81,7 +77,10 @@ namespace ppee_service.Optimization
                 //za svaki sat pozivamo optimizaciju
                 OptimizationPerHour optimizationPerHour = new OptimizationPerHour();
 
-                optimizationPerHour.DateTimeOfOptimization = DateTime.Parse(predictionHours[i].DateAndTime);
+                DateTime temp;
+                DateTime.TryParseExact(predictionHours[i].DateAndTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out temp);
+
+                optimizationPerHour.DateTimeOfOptimization = temp;
                 optimizationPerHour.Load = (int)predictionHours[i].Load;
 
                 List<OptimizedData> optimizedData = OptimizationPerHour(predictionHours[i], optimizationSettings, cloudsAndWindSpeeds[i].WindSpeed, cloudsAndWindSpeeds[i].WindSpeed, sunAnglesForHours[i]);
@@ -90,7 +89,6 @@ namespace ppee_service.Optimization
 
                 foreach (OptimizedData od in optimizedData)
                 {
-                    od.OptimizationPerHour = optimizationPerHour;
                     optimizationPerHour.LoadsFromPowerPlants.Add(od);
                 }
 
@@ -123,7 +121,7 @@ namespace ppee_service.Optimization
 
                     OptimizedData od = new OptimizedData()
                     {
-                        Name = powerPlant.Name + "-" + powerPlant.Id.ToString(),
+                        Name = powerPlant.Name,
                         Load = powerPlant.MaximumOutputPower,
                         Type = powerPlant.Type,
                         CO2 = 0,
@@ -144,7 +142,7 @@ namespace ppee_service.Optimization
 
                     OptimizedData od = new OptimizedData()
                     {
-                        Name = powerPlant.Name + "-" + powerPlant.Id.ToString(),
+                        Name = powerPlant.Name,
                         Load = tempPower,
                         Type = powerPlant.Type,
                         CO2 = 0,
@@ -162,7 +160,7 @@ namespace ppee_service.Optimization
                         renewableSources += tempPower;
                         windPower += tempPower;
                     }
-                    else if (windSpeed >= 12 || windSpeed <= 25)
+                    else if (windSpeed >= 12 && windSpeed <= 25)
                     {
                         tempPower = (int)(powerPlant.MaximumOutputPower * powerPlant.NumberOfWindGenerators) / 1000;
                         renewableSources += tempPower;
@@ -178,7 +176,7 @@ namespace ppee_service.Optimization
 
                     OptimizedData od = new OptimizedData()
                     {
-                        Name = powerPlant.Name + "-" + powerPlant.Id.ToString(),
+                        Name = powerPlant.Name,
                         Load = tempPower,
                         Type = powerPlant.Type,
                         CO2 = 0,
@@ -197,11 +195,12 @@ namespace ppee_service.Optimization
             if (renewableSources > forecast.Load - minimumOutputPowerFromNonRenewableSources)
             {
                 coefficient = (int)((forecast.Load - minimumOutputPowerFromNonRenewableSources) / renewableSources);
+                foreach (OptimizedData od in optimizedData)
+                {
+                    od.Load *= coefficient;
+                }
             }
-            foreach (OptimizedData od in optimizedData)
-            {
-                od.Load *= coefficient;
-            }
+
             renewableSources = (int)optimizedData.Sum(x => x.Load);
 
             int LoadForNonRenewablePowerPlants = (int)(forecast.Load - renewableSources);
@@ -315,7 +314,7 @@ namespace ppee_service.Optimization
             {
                 OptimizedData od = new OptimizedData()
                 {
-                    Name = powerPlants[i].Name + "-" + powerPlants[i].Id.ToString(),
+                    Name = powerPlants[i].Name,
                     Load = optimalSolution[i],
                     Type = powerPlants[i].Type,
                     CO2 = 0,
