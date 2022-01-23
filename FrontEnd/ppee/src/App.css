@@ -1258,3 +1258,21 @@ background-color: red;
   -webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.3); 
   box-shadow: inset 0 0 6px rgba(255,255,255,0.3); 
 }
+
+.optimization-chart{
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  margin: 10px auto;
+}
+
+#chart{
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 400px;
+}

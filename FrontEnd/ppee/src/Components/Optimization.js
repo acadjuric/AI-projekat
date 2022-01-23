@@ -4,6 +4,7 @@ import delteTrash from '../assets/delete1.png'
 // import saveIcon from '../assets/save-icon.png'
 import { baseUrl } from '../constants';
 import axios from 'axios';
+import MyChart from './MyChart';
 
 const generators = [
     { maximumOutputPower: 30, minimumOutputPower: 10, numberForOptimization: 2, type: "coal" },
@@ -322,6 +323,11 @@ class Optimization extends Component {
 
                     </div>
                 }
+
+                <div className='optimization-chart'>
+                    <MyChart />
+                </div>
+
                 <div className='tables-container'>
                     {
                         this.state.optimizationResult && this.state.optimizationResult.map((optimizationPerHour, index) => {
