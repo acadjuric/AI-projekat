@@ -17,7 +17,7 @@ namespace ppee_dataLayer.Services
             {
                 using (var db = new PPEE_DataContext())
                 {
-                    var old = (await db.PowerPlants.ToListAsync()).First(item => item.Name.ToLower().Equals(powerPlant.Name.ToLower()) && item.Type.ToLower().Equals(powerPlant.Type.ToLower()));
+                    var old = (await db.PowerPlants.ToListAsync()).Find(item => item.Name.ToLower().Equals(powerPlant.Name.ToLower()) && item.Type.ToLower().Equals(powerPlant.Type.ToLower()));
                     if (old == null)
                     {
                         db.PowerPlants.Add(powerPlant);
@@ -40,7 +40,7 @@ namespace ppee_dataLayer.Services
             {
                 using (var db = new PPEE_DataContext())
                 {
-                    var item = (await db.PowerPlants.ToListAsync()).First(x => x.Id.Equals(id));
+                    var item = (await db.PowerPlants.ToListAsync()).Find(x => x.Id.Equals(id));
                     if (item == null)
                         return false;
 
