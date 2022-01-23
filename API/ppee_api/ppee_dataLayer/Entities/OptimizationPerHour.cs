@@ -11,6 +11,9 @@ namespace ppee_dataLayer.Entities
     {
         public DateTime DateTimeOfOptimization { get; set; }
         public int Load { get; set; }
+        public double Price { get; set; }
+        public double Emission { get; set; }
+        public double LoadSum { get; set; }
         public List<OptimizedData> LoadsFromPowerPlants { get; set; }
 
         public OptimizationPerHour()

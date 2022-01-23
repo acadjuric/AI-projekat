@@ -107,6 +107,16 @@ namespace ppee_service.Optimization
                     optimizationPerHour.LoadsFromPowerPlants.Add(od);
                 }
 
+                double priceSum = optimizedData.Sum(x => x.Cost);
+                priceSum = Math.Round(priceSum, 2);
+
+                double emissionSum = optimizedData.Sum(x=> x.CO2);
+                emissionSum = Math.Round(emissionSum, 2);
+
+                optimizationPerHour.Emission = emissionSum;
+                optimizationPerHour.Price = priceSum;
+                optimizationPerHour.LoadSum = Math.Round(sum, 2);
+
                 //upis u bazu
                 dayOptimization.Add(optimizationPerHour);
             }
