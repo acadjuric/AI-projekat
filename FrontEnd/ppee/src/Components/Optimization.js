@@ -150,7 +150,7 @@ class Optimization extends Component {
         this.setState({ [event.target.id]: event.target.value })
     }
 
-    getValidDateFormatForOutput = (date,load) => {
+    getValidDateFormatForOutput = (date, load) => {
         // input date in format -> yyyy-MM-dd(T)HH:mm:ss; Example -> 2019-01-04T13:00:00
         var parts = date.split('T');
         var dateParts = parts[0].split('-');
@@ -353,14 +353,22 @@ class Optimization extends Component {
 
                                                                 <td className="opt-td">{optimizedData.Name}</td>
                                                                 <td className="opt-td">{optimizedData.Type}</td>
-                                                                <td className="opt-td">{optimizedData.Load}</td>
-                                                                <td className="opt-td">{optimizedData.Cost}</td>
-                                                                <td className="opt-td">{optimizedData.CO2}</td>
+                                                                <td className="opt-td">{optimizedData.Load} [MW]</td>
+                                                                <td className="opt-td">{optimizedData.Cost} $</td>
+                                                                <td className="opt-td">{optimizedData.CO2} [BTU]</td>
 
                                                             </tr>
                                                         )
                                                     })
                                                 }
+
+                                                <tr>
+                                                    <td className='opt-td'>FINAL</td>
+                                                    <td className='opt-td'></td>
+                                                    <td className='opt-td'>{optimizationPerHour.LoadSum} [MW]</td>
+                                                    <td className='opt-td'>{optimizationPerHour.Price} $</td>
+                                                    <td className='opt-td'>{optimizationPerHour.Emission} [BTU]</td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -368,79 +376,6 @@ class Optimization extends Component {
                             )
                         })
                     }
-                </div>
-
-                <div className='tables-container'>
-                    <div className='one-table'>
-                        <div className="tbl-header">
-                            <table className='optimization-table' cellPadding="0" cellSpacing="0" border="0">
-                                <thead>
-                                    <tr>
-                                        <th colSpan={5} className="opt-th th-datetime">04/01/2019 00:00</th>
-                                    </tr>
-                                    <tr>
-                                        <th className="opt-th">Name</th>
-                                        <th className="opt-th">Type</th>
-                                        <th className="opt-th">Load</th>
-                                        <th className="opt-th">Cost</th>
-                                        <th className="opt-th">CO2</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                        <div className="tbl-content">
-                            <table className='optimization-table' cellPadding="0" cellSpacing="0" border="0">
-                                <tbody>
-                                    <tr>
-                                        <td className="opt-td">AAC</td>
-                                        <td className="opt-td">AUSTRALIAN COMPANY </td>
-                                        <td className="opt-td">$1.38</td>
-                                        <td className="opt-td">+2.01</td>
-                                        <td className="opt-td">-0.36%</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td className='opt-td'>OVERALL</td>
-                                        <td className='opt-td'></td>
-                                        <td className='opt-td'>19560 [MW]</td>
-                                        <td className='opt-td'>999999124241 $</td>
-                                        <td className='opt-td'>835871348313 [BTU]</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div className='one-table'>
-                        <div className="tbl-header">
-                            <table className='optimization-table' cellPadding="0" cellSpacing="0" border="0">
-                                <thead>
-                                    <tr>
-                                        <th colSpan={5} className="opt-th th-datetime">04/01/2019 00:00</th>
-                                    </tr>
-                                    <tr>
-                                        <th className="opt-th">Name</th>
-                                        <th className="opt-th">Type</th>
-                                        <th className="opt-th">Load</th>
-                                        <th className="opt-th">Cost</th>
-                                        <th className="opt-th">CO2</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                        <div className="tbl-content">
-                            <table className='optimization-table' cellPadding="0" cellSpacing="0" border="0">
-                                <tbody>
-                                    <tr>
-                                        <td className="opt-td">AAC</td>
-                                        <td className="opt-td">AUSTRALIAN COMPANY </td>
-                                        <td className="opt-td">$1.38</td>
-                                        <td className="opt-td">+2.01</td>
-                                        <td className="opt-td">-0.36%</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
 
             </div>
