@@ -968,6 +968,9 @@ namespace ppee_service.Services
                         str = "Minimum output power must be greater than 1";
                 }
 
+                if (powerPlant.MinimumOutputPower > powerPlant.MaximumOutputPower)
+                    str = "Minimum power cannot be greater than maximum power";
+
             }
 
             return str;
