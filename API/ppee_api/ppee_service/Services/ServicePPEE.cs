@@ -751,30 +751,45 @@ namespace ppee_service.Services
             return true;
         }
 
-        public async Task<bool> AddPowerPlant(dynamic data)
+        public async Task<string> AddPowerPlant(dynamic data)
         {
-            string jsonString = JsonConvert.SerializeObject(data);
-            PowerPlant powerPlant = JsonConvert.DeserializeObject<PowerPlant>(jsonString);
-
-            if (powerPlant.Type.ToLower().Equals("solar"))
+            try
             {
-                int Imax = 1000;
-                powerPlant.MinimumOutputPower = 0;
-                powerPlant.MaximumOutputPower = Imax * powerPlant.Efficiency * powerPlant.SurfaceArea;
+                string jsonString = JsonConvert.SerializeObject(data);
+                PowerPlant powerPlant = JsonConvert.DeserializeObject<PowerPlant>(jsonString);
 
-            }
-            else if (powerPlant.Type.ToLower().Equals("wind"))
-            {
-                powerPlant.MinimumOutputPower = 0;
-                powerPlant.MaximumOutputPower = (int)(Math.Pow((powerPlant.BladesSweptAreaDiameter / 2), 2) * Math.PI);
-            }
-            else if (powerPlant.Type.ToLower().Equals("hydro"))
-            {
-                powerPlant.MinimumOutputPower = 0;
-            }
+                string validation = ValidationForPowerPlant(powerPlant);
 
-            IDatabase dataSloj = new DatabaseService();
-            return await dataSloj.AddPowerPlant(powerPlant);
+                if (validation != string.Empty) return validation;
+
+                if (powerPlant.Type.ToLower().Equals("solar"))
+                {
+                    int Imax = 1000;
+                    powerPlant.MinimumOutputPower = 0;
+                    powerPlant.MaximumOutputPower = Imax * powerPlant.Efficiency * powerPlant.SurfaceArea;
+
+                }
+                else if (powerPlant.Type.ToLower().Equals("wind"))
+                {
+                    powerPlant.MinimumOutputPower = 0;
+                    powerPlant.MaximumOutputPower = (int)(Math.Pow((powerPlant.BladesSweptAreaDiameter / 2), 2) * Math.PI);
+                }
+                else if (powerPlant.Type.ToLower().Equals("hydro"))
+                {
+                    powerPlant.MinimumOutputPower = 0;
+                }
+
+                IDatabase dataSloj = new DatabaseService();
+                if (await dataSloj.AddPowerPlant(powerPlant))
+                    return string.Empty;
+
+                return "Some error ocured";
+            }
+            catch(Exception ex)
+            {
+                string a = ex.Message;
+                return "Invalid data";
+            }
 
         }
 
@@ -852,6 +867,50 @@ namespace ppee_service.Services
                 return "-1";
             }
 
+        }
+
+        private string ValidationForPowerPlant(PowerPlant powerPlant)
+        {
+            string str = string.Empty;
+            try
+            {
+                double name = double.Parse(powerPlant.Name);
+                return "Name cannot be only numbers. Please provide at least one alphabet character";
+            }
+            catch(Exception ex)
+            {
+                string a = ex.Message;
+            }
+
+            if (powerPlant.Type.ToLower().Equals("solar"))
+            {
+                if (powerPlant.Efficiency < 1)
+                    str = "Efficiency must be greater than 1";
+                if (powerPlant.SurfaceArea < 1)
+                    str = "Surface area must be greater than 1";
+            }
+            else if (powerPlant.Type.ToLower().Equals("wind"))
+            {
+                if (powerPlant.BladesSweptAreaDiameter < 20)
+                    str = "Blades swept area diameter must be greater than 20";
+                if (powerPlant.NumberOfWindGenerators < 1)
+                    str = "Number of wind generatros must be greater than 1";
+            }
+            else
+            {
+                if (powerPlant.MaximumOutputPower < 1)
+                    str = "Maximum power must be greater than 1";
+
+                if(powerPlant.Type.ToLower().Equals("hydro") == false)
+                {
+                    //coal or gas
+                    if (powerPlant.MinimumOutputPower < 1)
+                        str = "Minimum output power must be greater than 1";
+                }
+
+            }
+
+            return str;
         }
     }
 }

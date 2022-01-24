@@ -20,7 +20,7 @@ namespace ppee_service.Interfaces
 
         Task<string> GetForecastValues(string startDate, string endDate, bool exportToCSV = false);
 
-        Task<bool> AddPowerPlant(dynamic data);
+        Task<string> AddPowerPlant(dynamic data);
 
         Task<bool> DeletePowerPlant(int id);
 

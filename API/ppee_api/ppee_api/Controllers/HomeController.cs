@@ -111,11 +111,11 @@ namespace ppee_api.Controllers
         {
             try
             {
-                bool retVal = await service.AddPowerPlant(jsonData);
-                if (retVal)
+                string retVal = await service.AddPowerPlant(jsonData);
+                if (retVal.Equals(string.Empty))
                     return Request.CreateResponse(HttpStatusCode.OK);
                 else
-                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid data");
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, retVal);
             }
             catch (Exception ex)
             {
