@@ -33,6 +33,7 @@ class FileUpload extends Component {
         axios.post(baseUrl + "home/fileupload", form).then(response => {
 
             console.log("Stiglo je od servera-> ", response.data);
+            alert("File uploaded successfully.");
 
         }).catch(error => {
 

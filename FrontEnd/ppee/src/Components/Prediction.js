@@ -79,9 +79,9 @@ class Prediction extends Component {
 
     render() {
         return (
-            <div className="report-container">
-                <h2 className='prediction_header'>Prediction</h2>
-                <div className='prediction_content'>
+            <div className="training-container">
+                <h2 className='training_header'>Prediction</h2>
+                <div className='training_content'>
                     <span>From date <input id="fromDate" type="date" onChange={this.onDateChange} /> </span>
                     <div className='select'>
                         <select name='numberOfDays' value={this.state.numberOfDays} onChange={this.handleSelectChange}>
