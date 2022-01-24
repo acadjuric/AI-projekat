@@ -448,7 +448,7 @@ namespace ppee_service.Services
 
                 // UZETI PODATKE U DATUMSKOM OPSEGU
 
-                //data = await GetWeatherLoadDataInDateRange(data, start, end);
+                data = await GetWeatherLoadDataInDateRange(data, start, end);
 
                 //END PODACI U DATUMSKOM OPSEGU
 
@@ -460,7 +460,9 @@ namespace ppee_service.Services
                 if (predictorData.Count != predictedData.Length)
                     return false;
 
-                const float frac = 0.9f;
+                //svaki trening uzimam 95 trening, 5 posto test da bih izracunao gresku i da sacuvam model kao
+                // model_{mape_error}
+                const float frac = 0.95f;
                 int trainCount = (int)Math.Round((data.Count * frac), 0);
 
                 var predictorTraining = predictorData.Take(trainCount).ToList();

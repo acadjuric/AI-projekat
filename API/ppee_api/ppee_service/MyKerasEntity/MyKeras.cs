@@ -50,7 +50,7 @@ namespace ppee_service.MyKerasEntity
 
         public void SaveModel(Sequential model, string mapeError)
         {
-            if (!this.path.Equals(string.Empty) && double.Parse(mapeError) < 11)
+            if (!this.path.Equals(string.Empty) && double.Parse(mapeError) < 17)
             {
                 if (mapeError.Contains('.'))
                     mapeError = mapeError.Replace('.', '_');
