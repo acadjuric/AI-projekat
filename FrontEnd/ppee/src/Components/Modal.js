@@ -170,11 +170,11 @@ class Modal extends Component {
                     <input className='modal-input' type="text" placeholder="Name" id="name" onChange={this.handleInputChange} />
 
                     {/* <label className='modal-label' htmlFor="maxProductionValue">{this.state.firstPlaceHolder}</label> */}
-                    <input className='modal-input' type="text" placeholder={this.state.firstPlaceHolder} id="maximumOutputPower" onChange={this.handleInputChange} />
+                    <input className='modal-input' min={1} type="number" placeholder={this.state.firstPlaceHolder} id="maximumOutputPower" onChange={this.handleInputChange} />
 
                     {/* <label className='modal-label' htmlFor="minProductionValue">{this.state.secondPlaceHolder} </label> */}
                     {this.state.minPowerDisabled ? null :
-                        (< input className='modal-input' type="text" placeholder={this.state.secondPlaceHolder} id="minimumOutputPower" onChange={this.handleInputChange} />)
+                        (< input className='modal-input' min={0} type="number" placeholder={this.state.secondPlaceHolder} id="minimumOutputPower" onChange={this.handleInputChange} />)
                     }
 
 
