@@ -49,7 +49,7 @@ class Optimization extends Component {
     GetAllGenerators = () => {
         axios.get(baseUrl + "home/getpowerplant").then(response => {
 
-            console.log("Server odgovorio-> ", response);
+            console.log("Server odgovorio get all generators-> ", response);
             this.setState({ myGenerators: JSON.parse(response.data) })
 
         }).catch(error => {
@@ -106,8 +106,9 @@ class Optimization extends Component {
     deleteGenerator = (id) => {
         console.log(id);
         axios.delete(baseUrl + "home/deletepowerplant/" + id).then(response => {
-            console.log(response);
-            this.getAllGenerators();
+            console.log("DELETE " + response);
+            this.GetAllGenerators();
+
         }).catch(error => {
             if (error.response) {
                 // Request made and server responded
@@ -170,7 +171,20 @@ class Optimization extends Component {
     }
 
     handleSettingsInputChange = (event) => {
-        this.setState({ [event.target.id]: event.target.value })
+        if (event.target.id === "optimizationType") {
+            if (event.target.value !== "both") {
+                this.setState({
+                    [event.target.id]: event.target.value,
+                    weightFactor: 0,
+                })
+            }
+            else {
+                this.setState({ [event.target.id]: event.target.value })
+            }
+        }
+        else
+            this.setState({ [event.target.id]: event.target.value })
+
     }
 
     getValidDateFormatForOutput = (date, load) => {
@@ -287,24 +301,33 @@ class Optimization extends Component {
 
                             <div className='settings-column'>
                                 <div className='settings-box'>
-                                    <label>Coal fuel cost</label> <input type="number" id="costCoal" onChange={this.handleSettingsInputChange} value={this.state.costCoal} />
+                                    <label>Coal cost</label> &nbsp;
+                                     <input type="number" id="costCoal" onChange={this.handleSettingsInputChange} value={this.state.costCoal} />&nbsp;
+                                     <label>$</label>
                                 </div>
 
                                 <div className='settings-box'>
-                                    <label>Gas fuel cost</label> <input type="number" id="costGas" onChange={this.handleSettingsInputChange} value={this.state.costGas} />
+                                    <label>Gas cost</label> &nbsp;&nbsp;
+                                    <input type="number" id="costGas" onChange={this.handleSettingsInputChange} value={this.state.costGas} />&nbsp;
+                                    <label>$</label>
                                 </div>
                             </div>
                             <div className='settings-column'>
                                 <div className='settings-box'>
-                                    <label>Coal CO2 emission</label> <input type="number" id="cO2Coal" onChange={this.handleSettingsInputChange} value={this.state.cO2Coal} />
+                                    <label>Coal CO2 emission</label> &nbsp;
+                                    <input type="number" id="cO2Coal" onChange={this.handleSettingsInputChange} value={this.state.cO2Coal} />&nbsp;
+                                    <label>BTU</label>
                                 </div >
 
                                 <div className='settings-box'>
-                                    <label>Gas CO2 emission</label> <input type="number" id="cO2Gas" onChange={this.handleSettingsInputChange} value={this.state.cO2Gas} />
+                                    <label>Gas CO2 emission</label> &nbsp;&nbsp;
+                                    <input type="number" id="cO2Gas" onChange={this.handleSettingsInputChange} value={this.state.cO2Gas} />&nbsp;
+                                    <label>BTU</label>
                                 </div>
                             </div>
                             <div className='settings-column'>
                                 <div className='settings-box'>
+                                    <label>Criterion</label> &nbsp;
                                     <select className='settings-select' id="optimizationType" onChange={this.handleSettingsInputChange}>
                                         <option value="cost">Minimize production costs</option>
                                         <option value="co2">Minimize CO2 emissions</option>
@@ -325,7 +348,7 @@ class Optimization extends Component {
                             {
                                 this.state.myGenerators && this.state.myGenerators.map((item, index) => {
                                     return (
-                                        <div className="card" key={index} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+                                        <div className="card" key={item.Id} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
                                             <div className={"card-image card-image-" + item.Type}></div>
                                             <div className="card-text">
 
@@ -337,7 +360,7 @@ class Optimization extends Component {
 
                                                 <div className="max-text">
                                                     <h3>Max value</h3>
-                                                    <p>{item.MaximumOutputPower} {item.Type === "solar" ? "[W]" : item.Type === "wind" ? "[KW]" : "[MW]"}</p>
+                                                    <p>{item.Type === "solar" ? item.MaximumOutputPower / 1000 + " [KW]" : item.Type === "wind" ? item.MaximumOutputPower + " [KW]" : item.MaximumOutputPower + " [MW]"}</p>
                                                 </div>
 
                                                 {

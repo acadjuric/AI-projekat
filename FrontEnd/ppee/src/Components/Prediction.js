@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { baseUrl } from '../constants';
 import axios from 'axios';
 
-const days = [1, 2, 3, 4, 5, 6, 7]
+const days = [0, 1, 2, 3, 4, 5, 6]
 
 // const results = [
 //     { id: 1, date: "15/12/2012", time: "13:00", MWh: 15000 },

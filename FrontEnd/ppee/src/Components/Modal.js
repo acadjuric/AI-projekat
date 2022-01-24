@@ -16,8 +16,8 @@ class Modal extends Component {
             surfaceArea: 0,
             bladesSweptAreaDiameter: 10,
             numberOfWindGenerators: 10,
-            firstPlaceHolder: "Max output power",
-            secondPlaceHolder: "Min output power",
+            firstPlaceHolder: "Max output power [MW]",
+            secondPlaceHolder: "Min output power [MW]",
             minPowerDisabled: false,
         }
     }
@@ -28,7 +28,7 @@ class Modal extends Component {
             if (event.target.value === "Wind") {
                 this.setState({
                     type: event.target.value,
-                    firstPlaceHolder: "Blades swept area diameter",
+                    firstPlaceHolder: "Blades swept area diameter [m]",
                     secondPlaceHolder: "Number of wind generators",
                     minPowerDisabled: false,
                 })
@@ -36,23 +36,23 @@ class Modal extends Component {
             else if (event.target.value === "Solar") {
                 this.setState({
                     type: event.target.value,
-                    firstPlaceHolder: "Surface area",
-                    secondPlaceHolder: "Efficiency",
+                    firstPlaceHolder: "Surface area [m]",
+                    secondPlaceHolder: "Efficiency [%]",
                     minPowerDisabled: false,
                 })
             }
             else if (event.target.value === "Hydro") {
                 this.setState({
                     type: event.target.value,
-                    firstPlaceHolder: "Max output power",
+                    firstPlaceHolder: "Max output power [MW]",
                     minPowerDisabled: true,
                 })
             }
             else {
                 this.setState({
                     minPowerDisabled: false,
-                    firstPlaceHolder: "Max output power",
-                    secondPlaceHolder: "Min output power",
+                    firstPlaceHolder: "Max output power [MW]",
+                    secondPlaceHolder: "Min output power [MW]",
                 })
             }
         }
