@@ -245,13 +245,13 @@ namespace ppee_service.Services
                 // provera da li postoji je po atributu finalData.exist(x=> x.date.equals(item.date));
                 List<WeatherAndLoad> finalData = await dataSloj.LoadFromDataBase();
                 int countFromDataBase = finalData.Count;
-
+                MinMaxValues minMaxValues = await dataSloj.LoadMinMaxValues();
 
                 foreach (var item in weathers)
                 {
                     //ako vec postoji u bazi, preskoci ga
                     // postoji ako su isti datum i vreme
-                    if (finalData.Exists(x => x.Date.Equals(item.Date)))
+                    if (finalData.Exists(x => x.Date.Equals(item.Date.Replace('.','/'))))
                         continue;
 
                     // ITEM DATE -> dan.mesec.godina sat:minut;
@@ -288,9 +288,30 @@ namespace ppee_service.Services
                         TotalCloudCover = float.Parse(item.TotalCloudCover),
                         Visibility = float.Parse(item.Visibility),
                         DewPointTemperature = float.Parse(item.DewPointTemperature),
-                        MWh = potorsnja.First(x => x.Date.Equals(validDateFormat) && x.FromTime.Equals(time)).MWh,
+                        //MWh = potorsnja.First(x => x.Date.Equals(validDateFormat) && x.FromTime.Equals(time)).MWh,
 
                     };
+
+                    //ako ima load u excel fajlu
+                    if(potorsnja.Count > 0)
+                    {
+                        try
+                        {
+                            //nadji ga na osnovu datuma
+                            wl.MWh = potorsnja.First(x => x.Date.Equals(validDateFormat) && x.FromTime.Equals(time)).MWh;
+                        }
+                        catch (Exception ex)
+                        {
+                            string a = ex.Message;
+
+                            wl.MWh = minMaxValues.MinMWh;
+                        }
+                        
+                    }
+                    else
+                    {
+                        wl.MWh = minMaxValues.MinMWh;
+                    }
 
                     finalData.Add(wl);
                     brojac = finalData.Count;

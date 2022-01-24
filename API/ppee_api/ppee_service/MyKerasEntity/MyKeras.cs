@@ -69,7 +69,7 @@ namespace ppee_service.MyKerasEntity
         {
             if (!this.pathToBestModel.Equals(string.Empty))
             {
-                Keras.Backend.ClearSession();
+                //Keras.Backend.ClearSession();
 
                 var model = Sequential.ModelFromJson(File.ReadAllText(this.pathToBestModel + "model.json"));
                 model.LoadWeight(this.pathToBestModel + "model.h5");
