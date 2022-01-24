@@ -251,7 +251,7 @@ namespace ppee_service.Services
                 {
                     //ako vec postoji u bazi, preskoci ga
                     // postoji ako su isti datum i vreme
-                    if (finalData.Exists(x => x.Date.Equals(item.Date.Replace('.','/'))))
+                    if (finalData.Exists(x => x.Date.Equals(item.Date.Replace('.', '/'))))
                         continue;
 
                     // ITEM DATE -> dan.mesec.godina sat:minut;
@@ -293,7 +293,7 @@ namespace ppee_service.Services
                     };
 
                     //ako ima load u excel fajlu
-                    if(potorsnja.Count > 0)
+                    if (potorsnja.Count > 0)
                     {
                         try
                         {
@@ -306,7 +306,7 @@ namespace ppee_service.Services
 
                             wl.MWh = minMaxValues.MinMWh;
                         }
-                        
+
                     }
                     else
                     {
@@ -556,7 +556,7 @@ namespace ppee_service.Services
                     return null;
 
                 //Kada je radjeno 90% trening 10% test nad svim podacima
-                
+
                 //const float frac = 0.9f;
                 //int trainCount = (int)Math.Round((data.Count * frac), 0);
 
@@ -566,7 +566,7 @@ namespace ppee_service.Services
                 //ovo je ono sto se ocekuje na izlazu, MWh
                 //List<float> predictedTest = predictedData.Skip(trainCount).ToList();
                 //float[,] matrixPredictorTest = KerasHelpers.CreateMatrix(predictorTest, predictorTest.Count, predictorTest[0].Count);
-                
+
                 //end 
 
 
@@ -785,7 +785,7 @@ namespace ppee_service.Services
 
                 return "Some error ocured";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 string a = ex.Message;
                 return "Invalid data";
@@ -877,10 +877,13 @@ namespace ppee_service.Services
                 double name = double.Parse(powerPlant.Name);
                 return "Name cannot be only numbers. Please provide at least one alphabet character";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 string a = ex.Message;
             }
+
+            if (string.IsNullOrEmpty(powerPlant.Name) || string.IsNullOrWhiteSpace(powerPlant.Name))
+                return "Please provide name for generator";
 
             if (powerPlant.Type.ToLower().Equals("solar"))
             {
@@ -901,7 +904,7 @@ namespace ppee_service.Services
                 if (powerPlant.MaximumOutputPower < 1)
                     str = "Maximum power must be greater than 1";
 
-                if(powerPlant.Type.ToLower().Equals("hydro") == false)
+                if (powerPlant.Type.ToLower().Equals("hydro") == false)
                 {
                     //coal or gas
                     if (powerPlant.MinimumOutputPower < 1)
