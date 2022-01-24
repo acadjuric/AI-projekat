@@ -521,7 +521,7 @@ namespace ppee_service.Services
 
                 // UZETI PODATKE U DATUMSKOM OPSEGU
 
-                //data = await GetWeatherLoadDataInDateRange(data, start, end);
+                data = await GetWeatherLoadDataInDateRange(data, start, end);
 
                 //END PODACI U DATUMSKOM OPSEGU
 
@@ -532,34 +532,46 @@ namespace ppee_service.Services
                 if (predictorData.Count != predictedData.Length)
                     return null;
 
-                const float frac = 0.9f;
-                int trainCount = (int)Math.Round((data.Count * frac), 0);
+                //Kada je radjeno 90% trening 10% test nad svim podacima
+                
+                //const float frac = 0.9f;
+                //int trainCount = (int)Math.Round((data.Count * frac), 0);
 
                 //ovo je ulaz u model, nezavisni podaci, temp, cloud, humidity...
-                var predictorTest = predictorData.Skip(trainCount).ToList();
+                //var predictorTest = predictorData.Skip(trainCount).ToList();
 
                 //ovo je ono sto se ocekuje na izlazu, MWh
-                List<float> predictedTest = predictedData.Skip(trainCount).ToList();
+                //List<float> predictedTest = predictedData.Skip(trainCount).ToList();
+                //float[,] matrixPredictorTest = KerasHelpers.CreateMatrix(predictorTest, predictorTest.Count, predictorTest[0].Count);
+                
+                //end 
 
-                float[,] matrixPredictorTest = KerasHelpers.CreateMatrix(predictorTest, predictorTest.Count, predictorTest[0].Count);
+
+                float[,] matrixPredictorTest = KerasHelpers.CreateMatrix(predictorData, predictorData.Count, predictorData[0].Count);
                 var NdPredictorTest = np.array(matrixPredictorTest).astype(np.float32);
 
 
-                int inputDim = predictorTest[0].Count;
+                int inputDim = predictorData[0].Count;
                 MyKeras myKeras = new MyKeras(inputDim);
 
                 var results = myKeras.Predict(NdPredictorTest);
 
                 if (results == null) return null;
 
-                predictedTest = KerasHelpers.InverseTransform_MWh(predictedTest, minMaxValues);
                 results = KerasHelpers.InverseTransform_MWh(results, minMaxValues);
 
-                double squareError = KerasHelpers.GetSquareDeviation(results, predictedTest);
-                double absoluteError = KerasHelpers.GetAbsoluteDeviation(results, predictedTest);
+                //moje racunanje greske
+
+                //predictedTest = KerasHelpers.InverseTransform_MWh(predictedTest, minMaxValues);
+
+                //double squareError = KerasHelpers.GetSquareDeviation(results, predictedTest);
+                //double absoluteError = KerasHelpers.GetAbsoluteDeviation(results, predictedTest);
+
+                //end moje racunanje greske
 
                 // Mapiranje podataka za export u csv, upis u bazu i vracanje klijentu
-                List<WeatherAndLoad> weahterWithRealDate = data.Skip(trainCount).ToList();
+                //List<WeatherAndLoad> weahterWithRealDate = data.Skip(trainCount).ToList();
+                List<WeatherAndLoad> weahterWithRealDate = data;
                 List<ForecastValues> dataForCsv = new List<ForecastValues>();
 
                 for (int i = 0; i < results.Count; i++)
@@ -577,7 +589,8 @@ namespace ppee_service.Services
                 await ExportToCSV(dataForCsv);
 
                 string jsonData = JsonConvert.SerializeObject(dataForCsv);
-                Tuple<string, double> retVal = new Tuple<string, double>(jsonData, absoluteError);
+                //Tuple<string, double> retVal = new Tuple<string, double>(jsonData, absoluteError);
+                Tuple<string, double> retVal = new Tuple<string, double>(jsonData, 0);
 
                 return retVal;
             }
