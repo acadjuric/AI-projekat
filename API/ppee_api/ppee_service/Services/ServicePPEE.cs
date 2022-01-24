@@ -706,10 +706,10 @@ namespace ppee_service.Services
             else
                 allDataEnd = DateTime.ParseExact("05/05/2019 23:00", "d/M/yyyy HH:mm", CultureInfo.InvariantCulture);
 
-            if (start < allDataStart)
+            if (start < allDataStart || start > allDataEnd)
                 return false;
 
-            if (end > allDataEnd)
+            if (end < allDataStart || end > allDataEnd)
                 return false;
 
             return true;
