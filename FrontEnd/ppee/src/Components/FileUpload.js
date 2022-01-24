@@ -39,7 +39,7 @@ class FileUpload extends Component {
             if (error.response) {
                 // Request made and server responded
                 console.log(error.response.data);
-                alert(error.response.data);
+                alert(error.response.data.Message);
 
             } else if (error.request) {
                 // The request was made but no response was received
