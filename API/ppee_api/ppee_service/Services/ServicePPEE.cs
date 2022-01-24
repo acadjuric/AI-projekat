@@ -827,37 +827,51 @@ namespace ppee_service.Services
 
         public async Task<string> OptimizationForDay(dynamic optimizationSettingsDynamic)
         {
-            string optimizationSettingsJSON = JsonConvert.SerializeObject(optimizationSettingsDynamic);
-
-            OptimizationSettings optimizationSettings = JsonConvert.DeserializeObject<OptimizationSettings>(optimizationSettingsJSON);
-
-            IDatabase dataBase = new DatabaseService();
-
-            List<PowerPlant> powerPlants = await dataBase.GetAllPowerPlants();
-
-            optimizationSettings.PowerPlantsForOptimization = new List<PowerPlant>();
-
-            foreach (var item in optimizationSettings.PowerPlantAndNumberForOptimization)
-            {
-                var powerPlant = powerPlants.Find(x => x.Id == item.Id);
-                if (powerPlant != null)
-                {
-                    for (int i = 0; i < item.Number; i++)
-                    {
-                        optimizationSettings.PowerPlantsForOptimization.Add(powerPlant);
-                    }
-                }
-            }
-
-            Optimization.Optimization optimization = new Optimization.Optimization();
-            List<OptimizationPerHour> dayOptimization = await optimization.CreateOptimization(optimizationSettings);
-
-            if (dayOptimization == null)
-                return "-1";
             try
             {
+                string optimizationSettingsJSON = JsonConvert.SerializeObject(optimizationSettingsDynamic);
+
+                OptimizationSettings optimizationSettings = JsonConvert.DeserializeObject<OptimizationSettings>(optimizationSettingsJSON);
+
+
+                string validation = ValidationForOptimizationSettings(optimizationSettings);
+
+                if (validation != string.Empty)
+                {
+                    if (validation == "-1") return "-1";
+
+                    return "validation:" + validation;
+                }
+
+                IDatabase dataBase = new DatabaseService();
+
+                List<PowerPlant> powerPlants = await dataBase.GetAllPowerPlants();
+
+                optimizationSettings.PowerPlantsForOptimization = new List<PowerPlant>();
+
+                foreach (var item in optimizationSettings.PowerPlantAndNumberForOptimization)
+                {
+                    var powerPlant = powerPlants.Find(x => x.Id == item.Id);
+                    if (powerPlant != null)
+                    {
+                        for (int i = 0; i < item.Number; i++)
+                        {
+                            optimizationSettings.PowerPlantsForOptimization.Add(powerPlant);
+                        }
+                    }
+                }
+
+                Optimization.Optimization optimization = new Optimization.Optimization();
+                List<OptimizationPerHour> dayOptimization = await optimization.CreateOptimization(optimizationSettings);
+
+                if (dayOptimization == null)
+                    return "-1";
+
                 if (dayOptimization.Count == 0)
                     return "Try with more generators";
+
+                if (dayOptimization.Count == 1)
+                    return "Sorry. There is no production prediction for choosen date";
 
                 return JsonConvert.SerializeObject(dayOptimization);
             }
@@ -867,6 +881,49 @@ namespace ppee_service.Services
                 return "-1";
             }
 
+        }
+
+        private string ValidationForOptimizationSettings(OptimizationSettings settings)
+        {
+            try
+            {
+                DateTime date;
+                DateTime.TryParseExact(settings.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out date);
+                //nije uspeo da pretvori datum
+                if (date == DateTime.MinValue)
+                    return "Please provide valid date";
+
+                DateTime allDataStart = DateTime.ParseExact("04/01/2019", "d/M/yyyy", CultureInfo.InvariantCulture);
+                DateTime allDataEnd = DateTime.ParseExact("31/05/2019", "d/M/yyyy", CultureInfo.InvariantCulture);
+
+                if (date < allDataStart || date > allDataEnd)
+                    return "Wrong date. Choose date from 04/01/2019 to 31/05/2019";
+
+                if (settings.CostCoal < 1)
+                    return "Value for coal cost must be greater than 1";
+
+                if (settings.CostGas < 1)
+                    return "Value for gas cost must be greater than 1";
+
+                if (settings.CO2Coal < 1)
+                    return "Value for coal CO2 emission must be greater than 1";
+
+                if (settings.CO2Gas < 1)
+                    return "Value for gas CO2 emission must be greater than 1";
+
+                if (string.IsNullOrEmpty(settings.OptimizationType) || string.IsNullOrWhiteSpace(settings.OptimizationType))
+                    return "Please select type of optimization";
+
+                if (settings.WeightFactor < 0 || settings.WeightFactor > 1)
+                    return "Weight factor must be between 0 and 1";
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                string a = ex.Message;
+                return "-1";
+            }
         }
 
         private string ValidationForPowerPlant(PowerPlant powerPlant)

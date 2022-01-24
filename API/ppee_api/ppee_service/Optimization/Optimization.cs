@@ -72,6 +72,10 @@ namespace ppee_service.Optimization
 
             List<OptimizationPerHour> dayOptimization = new List<OptimizationPerHour>();
 
+            //nije uradjena predikcija za ovaj dan
+            if (predictionHours.Count == 0)
+                dayOptimization.Add(new OptimizationPerHour());
+
             for (int i = 0; i < predictionHours.Count; i++)
             {
                 //za svaki sat pozivamo optimizaciju

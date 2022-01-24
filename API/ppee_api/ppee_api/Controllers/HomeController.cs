@@ -177,10 +177,17 @@ namespace ppee_api.Controllers
             try
             {
                 string result = await service.OptimizationForDay(optimizationSettings);
-                if (result != "-1")
-                    return Request.CreateResponse<string>(HttpStatusCode.OK, result);
-                else
+
+                if (result == "-1")
                     return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid request");
+
+                else if (result.Contains("validation"))
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, result.Split(':')[1]);
+
+                else
+                    return Request.CreateResponse<string>(HttpStatusCode.OK, result);
+
+
             }
             catch (Exception ex)
             {
