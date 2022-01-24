@@ -24,7 +24,7 @@ namespace ppee_api.Controllers
             if (await service.Training(model.FromDate, model.ToDate))
                 return Request.CreateResponse<string>(HttpStatusCode.OK, "Training successfully completed");
 
-            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured");
+            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured. Possible reasons: \n 1.Invalid date range. Choose date from 01/01/2016 to 05/05/2019\n 2.Predictor and predicted lengths are not equal");
 
         }
 
@@ -36,7 +36,7 @@ namespace ppee_api.Controllers
             if (retVal != null)
                 return Request.CreateResponse<Tuple<string, double>>(HttpStatusCode.OK, retVal);
 
-            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured");
+            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Some error ocured. Possible reasons: \n 1.Invalid date range. Choose date from 01/01/2016 to 31/05/2019\n 2.Predictor and predicted lengths are not equal");
         }
 
         [HttpPost, Route("api/home/report")]
@@ -46,7 +46,11 @@ namespace ppee_api.Controllers
             //var a = await service.GetForecastValues(model.FromDate, model.ToDate);
 
             string jsonData = await service.GetForecastValues(model.FromDate, model.ToDate);
-            return Request.CreateResponse<string>(HttpStatusCode.OK, jsonData);
+
+            if (jsonData != "-1")
+                return Request.CreateResponse<string>(HttpStatusCode.OK, jsonData);
+            else
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid date range. Choose date from 01/01/2016 to 31/05/2019");
 
         }
 
@@ -55,7 +59,10 @@ namespace ppee_api.Controllers
         {
             string response = await service.GetForecastValues(model.FromDate, model.ToDate, exportToCSV: true);
 
-            return Request.CreateResponse<string>(HttpStatusCode.OK, response);
+            if (response != "-1")
+                return Request.CreateResponse<string>(HttpStatusCode.OK, response);
+            else
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid date range. Choose date from 01/01/2016 to 31/05/2019");
         }
 
         [HttpPost, Route("api/home/fileupload")]

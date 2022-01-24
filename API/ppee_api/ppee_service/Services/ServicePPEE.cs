@@ -433,7 +433,9 @@ namespace ppee_service.Services
             {
                 DateTime start = DateTime.ParseExact(startDate, "d/M/yyyy", CultureInfo.InvariantCulture);
                 DateTime end = DateTime.ParseExact(endDate, "d/M/yyyy", CultureInfo.InvariantCulture);
-                end = end.AddHours(23); //kraj dana :)
+                end = end.AddHours(23); //kraj dana :)                
+
+                if (!ValidationForTrainingAndPrediction(start, end)) return false;
 
                 IDatabase dataSloj = new DatabaseService();
                 List<WeatherAndLoad> data = await dataSloj.LoadFromDataBase();
@@ -498,6 +500,7 @@ namespace ppee_service.Services
             }
             catch (Exception ex)
             {
+                string a = ex.Message;
                 throw ex;
             }
         }
@@ -510,7 +513,7 @@ namespace ppee_service.Services
                 DateTime start = DateTime.ParseExact(startDate, "d/M/yyyy", CultureInfo.InvariantCulture);
                 DateTime end = start.AddDays(numberOfDays).AddHours(23);
 
-
+                if (!ValidationForTrainingAndPrediction(start, end, true)) return null;
 
                 IDatabase dataSloj = new DatabaseService();
                 List<WeatherAndLoad> data = await dataSloj.LoadFromDataBase();
@@ -580,6 +583,7 @@ namespace ppee_service.Services
             }
             catch (Exception ex)
             {
+                string a = ex.Message;
                 throw ex;
             }
         }
@@ -635,12 +639,14 @@ namespace ppee_service.Services
 
                 end = end.AddHours(23); //kraj dana :)
 
+                if (!ValidationForTrainingAndPrediction(start, end, true)) return "-1";
+
                 IDatabase dataSloj = new DatabaseService();
                 List<ForecastValues> data = await dataSloj.LoadPredictedValues();
 
                 var retVal = await FindDataInDateRange(data, start, end);
 
-                if (exportToCSV)
+                if (exportToCSV && retVal.Count > 0)
                 {
                     startDate = startDate.Replace('/', '-');
                     endDate = endDate.Replace('/', '-');
@@ -655,6 +661,7 @@ namespace ppee_service.Services
             }
             catch (Exception ex)
             {
+                string a = ex.Message;
                 throw ex;
             }
         }
@@ -687,6 +694,25 @@ namespace ppee_service.Services
             }
 
             return Task.FromResult<List<WeatherAndLoad>>(retVal);
+        }
+
+        private bool ValidationForTrainingAndPrediction(DateTime start, DateTime end, bool predictionOrReport = false)
+        {
+            DateTime allDataStart = DateTime.ParseExact("01/01/2016 00:00", "d/M/yyyy HH:mm", CultureInfo.InvariantCulture);
+            DateTime allDataEnd;
+
+            if (predictionOrReport)
+                allDataEnd = DateTime.ParseExact("31/05/2019 23:00", "d/M/yyyy HH:mm", CultureInfo.InvariantCulture);
+            else
+                allDataEnd = DateTime.ParseExact("05/05/2019 23:00", "d/M/yyyy HH:mm", CultureInfo.InvariantCulture);
+
+            if (start < allDataStart)
+                return false;
+
+            if (end > allDataEnd)
+                return false;
+
+            return true;
         }
 
         public async Task<bool> AddPowerPlant(dynamic data)
@@ -784,12 +810,12 @@ namespace ppee_service.Services
 
                 return JsonConvert.SerializeObject(dayOptimization);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 string a = ex.Message;
                 return "-1";
             }
-            
+
         }
     }
 }
