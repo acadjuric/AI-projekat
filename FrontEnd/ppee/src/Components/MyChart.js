@@ -7,10 +7,10 @@ class MyChart extends Component {
 
         this.state = {
 
-            series: [100, 150, 300, 500, 300],
+            series: props.data,
             options: {
-                colors:['#ecb22e', '#23b67d', '#36c5f0', '#4a154b', "#e01e5a"],
-                labels:["Solar", "Wind", "Hydro", "Coal", "Gas"],
+                colors: ['#ecb22e', '#23b67d', '#36c5f0', '#4a154b', "#e01e5a"],
+                labels: ["Solar", "Wind", "Hydro", "Coal", "Gas"],
                 chart: {
                     type: 'donut',
                 },
@@ -20,24 +20,24 @@ class MyChart extends Component {
                         endAngle: 270,
                         donut: {
                             size: '60%'
-                          }
+                        }
                     }
                 },
                 dataLabels: {
-                    enabled: false
+                    enabled: true
                 },
                 fill: {
                     type: 'gradient',
                 },
                 legend: {
                     position: 'bottom',
-                    horizontalAlign: 'center', 
-                    fontSize: '16px',              
+                    horizontalAlign: 'center',
+                    fontSize: '16px',
                     formatter: function (val, opts) {
                         return val + " - " + opts.w.globals.series[opts.seriesIndex] + " [MW]";
                     },
                     labels: {
-                        colors: ['#ffffff','#ffffff','#ffffff','#ffffff','#ffffff'],
+                        colors: ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'],
                         useSeriesColors: false
                     },
                     itemMargin: {
@@ -47,10 +47,10 @@ class MyChart extends Component {
                 title: {
                     text: 'Distribution of production between types of generators',
                     style: {
-                        fontSize:  '20px',
-                        fontWeight:  'bold',
-                        color:  '#fff',
-                      },
+                        fontSize: '20px',
+                        fontWeight: 'bold',
+                        color: '#fff',
+                    },
                 },
                 responsive: [{
                     breakpoint: 480,
@@ -67,6 +67,15 @@ class MyChart extends Component {
 
 
         };
+    }
+
+    setNewDataFromParent(data){
+        console.log("stari")
+        console.log(this.state.series)
+        console.log("Novi podaci")
+        console.log(data);
+
+        this.setState({series : data})
     }
 
     render() {

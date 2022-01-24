@@ -20,7 +20,10 @@ const generatorsAndTheirNumberForOptimization = [];
 class Optimization extends Component {
     constructor() {
         super();
+        this.child = React.createRef();
+
         this.state = {
+            chartData: [],
             optimizationResult: [],
             showModal: false,
             myGenerators: generators,
@@ -124,11 +127,6 @@ class Optimization extends Component {
             powerPlantAndNumberForOptimization: generatorsAndTheirNumberForOptimization
         })
 
-
-        // console.log(generators[index]);
-        // generators[index].numberForOptimization = event.target.value;
-        // console.log(generators[index]);
-        // this.setState({ myGenerators: generators })
     }
 
     onDateChange = (event) => {
@@ -184,9 +182,43 @@ class Optimization extends Component {
             try {
                 console.log("Server->", JSON.parse(response.data));
 
-                this.setState({ optimizationResult: JSON.parse(response.data) })
+                response.data = JSON.parse(response.data);
+                var solarLoad = 0;
+                var windLoad = 0;
+                var hydroLoad = 0;
+                var coalLoad = 0;
+                var gasLoad = 0;
+
+                for (let item of response.data) {
+
+                    solarLoad += item.SolarLoad;
+                    windLoad += item.WindLoad;
+                    hydroLoad += item.HydroLoad;
+                    gasLoad += item.GasLoad;
+                    coalLoad += item.CoalLoad;
+
+                }
+                solarLoad = Math.round(solarLoad); 
+                windLoad = Math.round(windLoad);
+                hydroLoad = Math.round(hydroLoad);
+                gasLoad = Math.round(gasLoad);
+                coalLoad = Math.round(coalLoad);
+
+                var dataForChart = [solarLoad, windLoad, hydroLoad, coalLoad, gasLoad];
+
+                if (this.state.chartData.length > 0){
+                    this.child.current.setNewDataFromParent(dataForChart);
+                }
+                    
+
+                this.setState({
+                    optimizationResult: response.data,
+                    chartData: dataForChart,
+                });
+
             }
-            catch {
+            catch (e) {
+                // alert(e)
                 alert(response.data);
             }
 
@@ -324,9 +356,14 @@ class Optimization extends Component {
                     </div>
                 }
 
-                <div className='optimization-chart'>
-                    <MyChart />
-                </div>
+                {
+                    this.state.chartData && this.state.chartData.length > 0 ? (
+                        <div className='optimization-chart'>
+                            <MyChart ref={this.child} data={this.state.chartData} />
+                        </div>
+                    ) : null
+                }
+
 
                 <div className='tables-container'>
                     {
