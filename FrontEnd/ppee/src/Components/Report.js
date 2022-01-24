@@ -43,17 +43,25 @@ class Report extends Component {
             console.log("Stiglo je od report-a --> ", response.data);
 
             this.setState({
-                data : JSON.parse(response.data),
+                data: JSON.parse(response.data),
                 exportFromDate: body.FromDate,
                 exportToDate: body.ToDate,
             })
 
         }).catch(error => {
-            console.log(error);
+            if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                alert(error.response.data);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+            }
         })
     }
 
-    handleExport = () =>{
+    handleExport = () => {
 
         var body = {
             FromDate: this.state.exportFromDate,
@@ -65,9 +73,18 @@ class Report extends Component {
         axios.post(baseUrl + "home/export", body).then(response => {
 
             console.log("Stiglo je od exporta-a --> ", response.data);
+            alert("Exported data successfully");
 
         }).catch(error => {
-            console.log(error);
+            if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                alert(error.response.data);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+            }
         })
     }
 
@@ -91,12 +108,12 @@ class Report extends Component {
 
                 {
                     this.state.data === undefined ? null : (
-                        <div className='export_content'> 
+                        <div className='export_content'>
                             <button className='btnExport' onClick={this.handleExport}> Export to CSV </button>
                         </div>
                     )
                 }
-                { this.state.data === undefined ? null :
+                {this.state.data === undefined ? null :
                     (<div className="policy-container">
                         <div className="policy-table-report">
                             <div className="headings">

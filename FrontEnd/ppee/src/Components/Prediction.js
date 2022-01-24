@@ -57,15 +57,23 @@ class Prediction extends Component {
 
         axios.post(baseUrl + "home/forecast", body).then(response => {
 
-            console.log("Stiglo je od predicta-> ", response.data );
-            
-            this.setState({ 
+            console.log("Stiglo je od predicta-> ", response.data);
+
+            this.setState({
                 data: JSON.parse(response.data.m_Item1),
                 mapeError: response.data.m_Item2,
             })
 
         }).catch(error => {
-            console.log(error);
+            if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                alert(error.response.data);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+            }
         })
     }
 
@@ -92,10 +100,10 @@ class Prediction extends Component {
                 </div>
 
                 {
-                    this.state.mapeError === undefined ? null: <h4> Apsolutna greska - {this.state.mapeError}</h4>
+                    this.state.mapeError === undefined ? null : <h4> Apsolutna greska - {this.state.mapeError}</h4>
                 }
 
-                { this.state.data === undefined ? null :
+                {this.state.data === undefined ? null :
                     (<div className="policy-container">
                         <div className="policy-table">
                             <div className="headings">

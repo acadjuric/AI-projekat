@@ -58,7 +58,7 @@ class Modal extends Component {
         }
 
         this.setState({ [event.target.id]: event.target.value })
-        
+
     }
 
 
@@ -92,19 +92,19 @@ class Modal extends Component {
             powerPlant.maximumOutputPower = this.state.maximumOutputPower;
             powerPlant.minimumOutputPower = 0;
             powerPlant.type = "hydro";
-            powerPlant.name =this.state.name;
+            powerPlant.name = this.state.name;
         }
-        else if(this.state.type === "Coal"){
+        else if (this.state.type === "Coal") {
             powerPlant.maximumOutputPower = this.state.maximumOutputPower;
             powerPlant.minimumOutputPower = this.state.minimumOutputPower;
             powerPlant.type = "coal";
-            powerPlant.name =this.state.name;
+            powerPlant.name = this.state.name;
         }
-        else if(this.state.type === "Gas"){
+        else if (this.state.type === "Gas") {
             powerPlant.maximumOutputPower = this.state.maximumOutputPower;
             powerPlant.minimumOutputPower = this.state.minimumOutputPower;
             powerPlant.type = "gas";
-            powerPlant.name =this.state.name;
+            powerPlant.name = this.state.name;
         }
 
         console.log(powerPlant);
@@ -115,15 +115,23 @@ class Modal extends Component {
 
             //poziv za dobavljanje novo dodatih generatora
             this.props.getAllGenerators();
-            
+
             // ako prodje sve kako treba, zatvoriti modal
             this.props.toggleModal();
 
         }).catch(error => {
-            console.log(error);
+            if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                alert(error.response.data);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+            }
         })
 
-        
+
     }
 
     CloseModal = event => {

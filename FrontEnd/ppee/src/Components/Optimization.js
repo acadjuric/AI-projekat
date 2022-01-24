@@ -53,7 +53,15 @@ class Optimization extends Component {
             this.setState({ myGenerators: JSON.parse(response.data) })
 
         }).catch(error => {
-            console.log(error);
+            if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                alert(error.response.data);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+            }
         })
     }
 
@@ -74,7 +82,15 @@ class Optimization extends Component {
             })
 
         }).catch(error => {
-            console.log(error);
+            if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                alert(error.response.data);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+            }
         })
     }
 
@@ -93,7 +109,15 @@ class Optimization extends Component {
             console.log(response);
             this.getAllGenerators();
         }).catch(error => {
-            console.log(error);
+            if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                alert(error.response.data);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+            }
         })
     }
 
@@ -198,7 +222,7 @@ class Optimization extends Component {
                     coalLoad += item.CoalLoad;
 
                 }
-                solarLoad = Math.round(solarLoad); 
+                solarLoad = Math.round(solarLoad);
                 windLoad = Math.round(windLoad);
                 hydroLoad = Math.round(hydroLoad);
                 gasLoad = Math.round(gasLoad);
@@ -206,10 +230,10 @@ class Optimization extends Component {
 
                 var dataForChart = [solarLoad, windLoad, hydroLoad, coalLoad, gasLoad];
 
-                if (this.state.chartData.length > 0){
+                if (this.state.chartData.length > 0) {
                     this.child.current.setNewDataFromParent(dataForChart);
                 }
-                    
+
 
                 this.setState({
                     optimizationResult: response.data,
@@ -223,7 +247,15 @@ class Optimization extends Component {
             }
 
         }).catch(error => {
-            console.log(error);
+            if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                alert(error.response.data);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+            }
         })
     }
 

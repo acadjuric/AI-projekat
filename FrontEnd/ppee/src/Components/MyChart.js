@@ -69,13 +69,13 @@ class MyChart extends Component {
         };
     }
 
-    setNewDataFromParent(data){
+    setNewDataFromParent(data) {
         console.log("stari")
         console.log(this.state.series)
         console.log("Novi podaci")
         console.log(data);
 
-        this.setState({series : data})
+        this.setState({ series: data })
     }
 
     render() {

@@ -35,7 +35,16 @@ class FileUpload extends Component {
             console.log("Stiglo je od servera-> ", response.data);
 
         }).catch(error => {
-            console.log(error);
+
+            if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                alert(error.response.data);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+            }
         })
     }
 
