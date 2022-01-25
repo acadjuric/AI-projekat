@@ -812,10 +812,10 @@ namespace ppee_service.Services
         public Task<string> GetDefaultOptimizationSettings()
         {
             OptimizationSettings optimizationSettings = new OptimizationSettings();
-            optimizationSettings.CO2Coal = 215; //Pounds of CO2 emitted per million British thermal units (Btu) of energy for various fuels:
-            optimizationSettings.CO2Gas = 117;  // Pounds of CO2 emitted per million British thermal units (Btu) of energy for various fuels:
-            optimizationSettings.CostGas = 57; // natural gas combined cycle coming in at $41 to $74 per MWh
-            optimizationSettings.CostCoal = 300; //coal cost between $57 and $148 per megawatt-hour.
+            optimizationSettings.CO2Coal = 200; //Pounds of CO2 emitted per million British thermal units (Btu) of energy for various fuels:
+            optimizationSettings.CO2Gas = 50;  // Pounds of CO2 emitted per million British thermal units (Btu) of energy for various fuels:
+            optimizationSettings.CostGas = 300; // natural gas combined cycle coming in at $41 to $74 per MWh
+            optimizationSettings.CostCoal = 100; //coal cost between $57 and $148 per megawatt-hour.
             optimizationSettings.Date = "";
             optimizationSettings.OptimizationType = "cost";
             optimizationSettings.PowerPlantsForOptimization = new List<PowerPlant>();

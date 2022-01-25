@@ -312,7 +312,7 @@ namespace ppee_service.Optimization
         private List<OptimizedData> OptimizationForNonRenewable(OptimizationSettings optimizationSettings, List<PowerPlant> powerPlants, double load)
         {
             // Z = MAX( -1X - 2Y)
-            DoubleVector costFunction = new DoubleVector();
+            DoubleVector function = new DoubleVector();
 
             //SVAKI GENERATOR JE POSEBAN ZA SEBE
             // X + Y + Z + U + V + M + N = SAMO ONO STO NEOBNOVLJIVI TREBA DA PROIZVODE [LOAD]
@@ -324,22 +324,22 @@ namespace ppee_service.Optimization
                 {
                     if (powerPlant.Type.ToLower().Equals("coal"))
                     {
-                        costFunction.Append(-optimizationSettings.CostCoal);
+                        function.Append(-optimizationSettings.CostCoal);
                     }
                     else if (powerPlant.Type.ToLower().Equals("gas"))
                     {
-                        costFunction.Append(-optimizationSettings.CostGas);
+                        function.Append(-optimizationSettings.CostGas);
                     }
                 }
                 else if (optimizationSettings.OptimizationType.ToLower().Equals("co2"))
                 {
                     if (powerPlant.Type.ToLower().Equals("coal"))
                     {
-                        costFunction.Append(-optimizationSettings.CO2Coal);
+                        function.Append(-optimizationSettings.CO2Coal);
                     }
                     else if (powerPlant.Type.ToLower().Equals("gas"))
                     {
-                        costFunction.Append(-optimizationSettings.CO2Gas);
+                        function.Append(-optimizationSettings.CO2Gas);
                     }
                 }
 
@@ -347,7 +347,7 @@ namespace ppee_service.Optimization
 
             }
 
-            LinearProgrammingProblem linearProgrammingProblem = new LinearProgrammingProblem(costFunction);
+            LinearProgrammingProblem linearProgrammingProblem = new LinearProgrammingProblem(function);
 
             linearProgrammingProblem.AddEqualityConstraint(allPowerPlants, load);
 
@@ -402,15 +402,15 @@ namespace ppee_service.Optimization
             int cost = 0;
             int co2emission = 0;
 
-            double x = Scale(load, powerPlant.MinimumOutputPower, powerPlant.MaximumOutputPower, 8, 16);
+            double x = Scale(load, powerPlant.MinimumOutputPower, powerPlant.MaximumOutputPower, 5, 10);
             if (powerPlant.Type.ToLower().Equals("gas"))
             {
-                cost = (int)((8 / x) * optimizationSettings.CostGas * load);
+                cost = (int)((5 / x) * optimizationSettings.CostGas * load);
                 co2emission = (int)((0.5 + Math.Pow((x / 5), 2)) * optimizationSettings.CO2Gas * load);
             }
             else
             {
-                cost = (int)((8 / x) * optimizationSettings.CostCoal * load);
+                cost = (int)((5 / x) * optimizationSettings.CostCoal * load);
                 co2emission = (int)((0.5 + Math.Pow((x / 5), 2)) * optimizationSettings.CO2Coal * load);
             }
 
