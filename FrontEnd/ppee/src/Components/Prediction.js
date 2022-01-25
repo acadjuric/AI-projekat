@@ -99,9 +99,9 @@ class Prediction extends Component {
                     <button className='btn' onClick={this.handlePredict}>Predict</button>
                 </div>
 
-                {
+                {/* {
                     this.state.mapeError === undefined ? null : <h4> Apsolutna greska - {this.state.mapeError}</h4>
-                }
+                } */}
 
                 {this.state.data === undefined ? null :
                     (<div className="policy-container">
