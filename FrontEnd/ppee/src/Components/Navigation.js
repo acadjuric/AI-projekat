@@ -4,6 +4,7 @@ import imgFile from '../assets/file.png';
 import nn from '../assets/nn.jpg';
 import predictionImg from '../assets/prediction.png'
 import predictive from '../assets/predictive-chart.png'
+import opt from '../assets/opt.png';
 
 class Navigation extends Component {
     constructor() {
@@ -80,7 +81,7 @@ class Navigation extends Component {
 
                     <li className={this.state.tab_index === "5" ? "list active" : "list"} onClick={this.handleOnClick} name="5">
                         <Link className="aLink" to="/optimization" name="5">
-                            <span className="icon" name="5"><img src={predictive} alt="img" name="5" /></span>
+                            <span className="icon" name="5"><img src={opt} alt="img" name="5" /></span>
                             <span className="text" hidden={this.state.tab_index === "5" ? false : true} name="5"> Optimization</span>
                         </Link>
                     </li>
