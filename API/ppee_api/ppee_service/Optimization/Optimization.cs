@@ -87,7 +87,7 @@ namespace ppee_service.Optimization
                 optimizationPerHour.DateTimeOfOptimization = temp;
                 optimizationPerHour.Load = (int)predictionHours[i].Load;
 
-                List<OptimizedData> optimizedData = OptimizationPerHour(predictionHours[i], optimizationSettings, cloudsAndWindSpeeds[i].WindSpeed, cloudsAndWindSpeeds[i].WindSpeed, sunAnglesForHours[i]);
+                List<OptimizedData> optimizedData = OptimizationPerHour(predictionHours[i], optimizationSettings, cloudsAndWindSpeeds[i].WindSpeed, cloudsAndWindSpeeds[i].Clouds, sunAnglesForHours[i]);
 
                 //optimizationPerHour.LoadsFromPowerPlants = optimizedData;
 
